@@ -1,15 +1,12 @@
 import cv2.cv2 as cv2
 import numpy as np
 from sklearn.cluster import KMeans
+import os
+import warnings
 import matplotlib.pyplot as plt
-
 
 def warn(*args, **kwargs):
     pass
-
-
-import warnings
-
 warnings.warn = warn
 
 
@@ -21,8 +18,9 @@ class ImageProcessor():
         self.CATEGORY_TWO_PIECE = []
 
     @staticmethod
-    def load_image(path):
-        return cv2.imread(path, cv2.IMREAD_COLOR)
+    def load_image(filename):
+        dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','pictures/', filename))
+        return cv2.imread(dir_path, cv2.IMREAD_COLOR)
 
     @staticmethod
     def show_off_image(img):
@@ -152,7 +150,7 @@ class ImageProcessor():
 
 if __name__ == '__main__':
     img_proc = ImageProcessor()
-    image = img_proc.load_image("/home/patryk/Dev/Checkers/pictures/planszafull.png")
+    image = img_proc.load_image("planszafull.png")
     image = img_proc.resize(16, image)
     b = img_proc.iterate_through_image(image)
     for c in b:
