@@ -74,11 +74,12 @@ class ImageProcessor():
         return to_return
 
     def set_default_colors(self, ranking):
-        sorted_ranking = sorted(ranking[2:4], key=lambda x: sum(x["RGB"]), reverse=False)
-        self.WHITE_FIELD = ranking[0]["RGB"]
-        self.BLACK_FIELD = ranking[1]["RGB"]
-        self.CATEGORY_ONE_PIECE = sorted_ranking[0]["RGB"]
-        self.CATEGORY_TWO_PIECE = sorted_ranking[1]["RGB"]
+        sorted_ranking_fields = sorted(ranking[0:2], key=lambda x: sum(x["RGB"]), reverse=True)
+        sorted_ranking_pieces = sorted(ranking[2:4], key=lambda x: sum(x["RGB"]), reverse=False)
+        self.WHITE_FIELD = sorted_ranking_fields[0]["RGB"]
+        self.BLACK_FIELD = sorted_ranking_fields[1]["RGB"]
+        self.CATEGORY_ONE_PIECE = sorted_ranking_pieces[0]["RGB"]
+        self.CATEGORY_TWO_PIECE = sorted_ranking_pieces[1]["RGB"]
 
     def tolerance_comparsion(self, a, b, tolerance=100):
         a = np.array(a)
