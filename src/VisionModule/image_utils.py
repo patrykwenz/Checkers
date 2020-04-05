@@ -5,8 +5,11 @@ import os
 import warnings
 import matplotlib.pyplot as plt
 
+
 def warn(*args, **kwargs):
     pass
+
+
 warnings.warn = warn
 
 
@@ -19,8 +22,8 @@ class ImageProcessor():
 
     @staticmethod
     def load_image(filename):
-        dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','pictures/', filename))
-        return cv2.imread(dir_path, cv2.IMREAD_COLOR)
+        dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'pictures/', filename))
+        return cv2.imread(dir_path)
 
     @staticmethod
     def show_off_image(img):
@@ -58,7 +61,7 @@ class ImageProcessor():
         clusters.fit(image)
         return clusters
 
-    def get_image_colors(self, image, number_of_clusters=4):
+    def get_image_colors(self, image, number_of_clusters=2):
         clusters = self.k_means_image_colors(image, number_of_clusters=number_of_clusters)
         hist = self.create_histogram(clusters)
         combined = zip(hist, clusters.cluster_centers_)
@@ -74,14 +77,15 @@ class ImageProcessor():
         return to_return
 
     def set_default_colors(self, ranking):
-        sorted_ranking_fields = sorted(ranking[0:2], key=lambda x: sum(x["RGB"]), reverse=True)
-        sorted_ranking_pieces = sorted(ranking[2:4], key=lambda x: sum(x["RGB"]), reverse=False)
-        self.WHITE_FIELD = sorted_ranking_fields[0]["RGB"]
-        self.BLACK_FIELD = sorted_ranking_fields[1]["RGB"]
-        self.CATEGORY_ONE_PIECE = sorted_ranking_pieces[0]["RGB"]
-        self.CATEGORY_TWO_PIECE = sorted_ranking_pieces[1]["RGB"]
+        sorted_ranking = sorted(ranking, key=lambda x: sum(x["RGB"]), reverse=True)
+        # sorted_ranking_fields = sorted(ranking[0:2], key=lambda x: sum(x["RGB"]), reverse=True)
+        # sorted_ranking_pieces = sorted(ranking[2:4], key=lambda x: sum(x["RGB"]), reverse=False)
+        self.WHITE_FIELD = sorted_ranking[0]["RGB"]
+        self.BLACK_FIELD = sorted_ranking[3]["RGB"]
+        self.CATEGORY_ONE_PIECE = sorted_ranking[1]["RGB"]
+        self.CATEGORY_TWO_PIECE = sorted_ranking[2]["RGB"]
 
-    def tolerance_comparsion(self, a, b, tolerance=100):
+    def tolerance_comparsion(self, a, b, tolerance=80):
         a = np.array(a)
         b = np.array(b)
         return (abs(a - b) <= tolerance).all()
@@ -117,13 +121,14 @@ class ImageProcessor():
 
     def iterate_through_image(self, image):
         height, width, _ = image.shape
-        height_step = round(height / 8)
-        width_step = round(width / 8)
+        height_step = int(height / 8)
+        width_step = int(width / 8)
+        mod_height = int(height % 8)
+        mod_width = int(width % 8)
 
         prep = image.reshape((height * width, 3))
         # set default colors, scan whole image
         self.set_default_colors(self.get_image_colors(prep, number_of_clusters=4))
-
         count = 0
         BOARD = []
         for i in range(0, height, height_step):
@@ -132,20 +137,25 @@ class ImageProcessor():
                 height_to_crop = i + height_step
                 width_to_crop = j + width_step
 
+                height_to_crop_start = i + mod_height
+                width_to_crop_start = j + mod_width
                 if height_to_crop > height:
                     break
                 if width_to_crop > width:
                     break
 
-                temp = image[i:height_to_crop, j:width_to_crop]
+                temp = image[height_to_crop_start:height_to_crop, width_to_crop_start:width_to_crop]
                 t_height, t_width, _ = temp.shape
 
                 tempo = temp.reshape((t_height * t_width, 3))
                 results = self.get_image_colors(tempo)
-                results = self.convert_results(results)
+                res = self.convert_results(results)
                 count += 1
+                print(count)
+                print(results)
                 FIELD["ID"] = count
-                FIELD["DATA"] = results
+                FIELD["DATA"] = res
+                FIELD["pic"] = temp
                 BOARD.append(FIELD)
         return BOARD
 
@@ -153,7 +163,13 @@ class ImageProcessor():
 if __name__ == '__main__':
     img_proc = ImageProcessor()
     image = img_proc.load_image("planszafull.png")
-    image = img_proc.resize(16, image)
+    image = img_proc.resize(20, image)
     b = img_proc.iterate_through_image(image)
     for c in b:
-        print(c)
+        print(c["ID"], c["DATA"])
+    for i, c in enumerate(b):
+        a = np.array(c['pic'])
+        cv2.imshow(str(i + 1), a)
+        k = cv2.waitKey(0)
+        if k == 27:  # wait for ESC key to exit
+            cv2.destroyAllWindows()
