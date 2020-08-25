@@ -50,7 +50,7 @@ def find_circles(img, BOARD):
             BOARD[get_block_id_by_cords((x, y), blocksizes=blocksizes)]["Piece"] = img[y, x]
 
 
-def calibrate_params(filename="planszafull.png"):
+def calibrate_params(filename="planszafullborder.jpg"):
     WINDOW_NAME = "Config"
     cv2.namedWindow(WINDOW_NAME)
 
@@ -179,13 +179,14 @@ def get_board_from_border(img):
 
 if __name__ == '__main__':
     points = []
-    img = load_image("plansza00.png")
-    img = resize(20, img)
+    calibrate_params("wiadomka.png")
+    # img = load_image("planszafullborder.jpg")
+    # img = resize(20, img)
     # calibrate_image(img)
-    b = generate_chessboard()
-    find_circles(img, b)
-    for line in b:
-        print(line)
+    # b = generate_chessboard()
+    # find_circles(img, b)
+    # for line in b:
+    #     print(line)
     # res = calibrate_image(img)
     # cv2.imwrite(path_to_src('pictures', "calib.png"), res)
     # pip = load_image("calib.png")
