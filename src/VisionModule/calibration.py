@@ -32,7 +32,9 @@ def load_configs(filename="config.txt"):
     return conf["param1"], conf["param2"]
 
 
-def find_circles(img, param1, param2, BOARD, blocksizes):
+def find_circles(img, BOARD):
+    param1, param2 = load_configs()
+    blocksizes = get_block_size(img)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gray_blurred = cv2.medianBlur(gray, 5)
     detected_circles = cv2.HoughCircles(gray_blurred,
@@ -138,6 +140,7 @@ def get_block_id_by_cords(cords, blocksizes):
 def mouse_drawing(event, x, y, flags, params):
     if event == cv2.EVENT_LBUTTONDOWN:
         cv2.circle(img, (x, y), 5, (0, 0, 255), -1)
+        print(x,y)
         points.append([x, y])
 
 
@@ -158,6 +161,17 @@ def calibrate_image(img):
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
     result = cv2.warpPerspective(img, matrix, (800, 800))
     cv2.imshow("Frame", result)
+    cv2.waitKey(10000)
+    cv2.destroyAllWindows()
+    return result
+
+def get_board_from_border(img):
+    pts2 = np.float32([[0, 0], [800, 0], [0, 800], [800, 800]])
+
+    pts1 = np.float32([points[0], points[1], points[2], points[3]])
+    matrix = cv2.getPerspectiveTransform(pts1, pts2)
+    result = cv2.warpPerspective(img, matrix, (800, 800))
+    cv2.imshow("Frame", result)
     cv2.waitKey(100)
     cv2.destroyAllWindows()
     return result
@@ -165,9 +179,14 @@ def calibrate_image(img):
 
 if __name__ == '__main__':
     points = []
-    img = load_image("planszafullborder.jpg")
-    # # img = resize(20, img)
+    img = load_image("plansza00.png")
+    img = resize(20, img)
+    # calibrate_image(img)
+    b = generate_chessboard()
+    find_circles(img, b)
+    for line in b:
+        print(line)
     # res = calibrate_image(img)
     # cv2.imwrite(path_to_src('pictures', "calib.png"), res)
     # pip = load_image("calib.png")
-    calibrate_params("calib.png")
+    # calibrate_params("calib.png")
