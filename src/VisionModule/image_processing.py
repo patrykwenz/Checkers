@@ -34,7 +34,7 @@ def generate_chessboard():
     chessboard = list()
     for i in range(8):
         for j in range(8):
-            FIELD = {"ID": i * 8 + j, "Piece": None, "Crown": False }
+            FIELD = {"ID": i * 8 + j, "Piece": None, "Crown": False}
             if (i + j) % 2 == 0:
                 FIELD["Field"] = "White"
                 chessboard.append(FIELD)
@@ -63,9 +63,14 @@ def resize(scale_percent, image):
     return cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
 
 
-def load_configs(filename="config.txt"):
+def load_configs(filename="config.txt", key1="param1", key2="param2"):
     conf = json.load(open(path_to_src("configs/", filename)))
-    return conf["param1"], conf["param2"]
+    return conf[key1], conf[key2]
+
+
+def load_configs_dict(filename="color_config.txt"):
+    conf = json.load(open(path_to_src("configs/", filename)))
+    return conf
 
 
 def get_block_size(image):
@@ -120,29 +125,33 @@ def get_board_from_border(img, points):
     return result
 
 
-def run(filename="planszafullborder.jpg"):
-    # load image
-    img = load_image(filename)
+#
+# def run(filename="planszafullborder.jpg"):
+#     # load image
+#     img = load_image(filename)
+#
+#     # find corners
+#     corners = get_corners(img)
+#
+#     # find valid corners
+#     points = get_valid_corners(corners)
+#
+#     # get rid off layout
+#     img = get_board_from_border(img, points)
+#
+#     # find circles
+#     board = find_circles(img)
+#
+#     for line in board:
+#         print(line)
 
-    # find corners
-    corners = get_corners(img)
 
-    # find valid corners
-    points = get_valid_corners(corners)
-
-    # get rid off layout
-    img = get_board_from_border(img, points)
-
-    # find circles
-    board = find_circles(img)
-
-    for line in board:
-        print(line)
-
-
+# find pieces and crowns
 def find_pieces(img):
     BOARD = generate_chessboard()
     param1, param2 = load_configs()
+    color_dict = swap_dict_keys_and_vals(load_configs_dict())
+    print(color_dict)
     blocksizes = get_block_size(img)
 
     # find circles
@@ -158,7 +167,9 @@ def find_pieces(img):
         for (x, y, r) in detected_circles[0, :]:
             board_id = get_block_id_by_cords((x, y), blocksizes=blocksizes)
             cv2.circle(output, (x, y), r, (0, 255, 0), 2)
-            BOARD[board_id]["Piece"] = img[y, x]
+
+            color_value = tuple(list(img[y, x]))
+            BOARD[board_id]["Piece"] = color_dict[color_value]
             cv2.imwrite("savecircles.png", output)
 
             rectX = int(x - r)
@@ -177,7 +188,7 @@ def is_crown(given_area):
     return True if number_of_corners == 7 else False
 
 
-def final_run(filename = "damkiresize.png"):
+def final_run(filename="damkiresize.png"):
     # load image
     img = load_image(filename)
 
@@ -190,11 +201,70 @@ def final_run(filename = "damkiresize.png"):
     # get rid off layout
     img = get_board_from_border(img, points)
 
+    # prepare configs
+    initialize_config_colors(img)
+
     # find circles
     board = find_pieces(img)
 
     for line in board:
         print(line)
+
+
+# set pieces colors
+
+def initialize_config_colors(img):
+    param1, param2 = load_configs()
+    blocksizes = get_block_size(img)
+    COLOR_TOP, COLOR_BOT = [], []
+
+    # find circles
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray_blurred = cv2.medianBlur(gray, 5)
+    detected_circles = cv2.HoughCircles(gray_blurred,
+                                        cv2.HOUGH_GRADIENT, 1, 30, param1=param1,
+                                        param2=param2, minRadius=0, maxRadius=int(img.shape[0] / 8))
+
+    if detected_circles is not None:
+        detected_circles = np.uint16(np.around(detected_circles))
+        for (x, y, r) in detected_circles[0, :]:
+            board_id = get_block_id_by_cords((x, y), blocksizes=blocksizes)
+            color = list(img[y, x])
+            if board_id < 40:
+                COLOR_TOP.append(color)
+            else:
+                COLOR_BOT.append(color)
+
+    if len(COLOR_TOP) < 12:
+        return False
+
+    if len(COLOR_BOT) < 12:
+        return False
+
+    if COLOR_TOP.count(COLOR_TOP[0]) != len(COLOR_TOP):
+        return False
+
+    if COLOR_BOT.count(COLOR_BOT[0]) != len(COLOR_BOT):
+        return False
+
+    # convert types
+    color_top_value = tuple([int(i) for i in COLOR_TOP[0]])
+    color_bot_value = tuple([int(i) for i in COLOR_BOT[0]])
+
+    # prepare to save
+    d = dict()
+    d["COLOR_TOP"] = color_top_value
+    d["COLOR_BOT"] = color_bot_value
+
+    # save file
+    json.dump(d, open(save_configs("color_config.txt"), 'w'))
+    return True, d
+
+
+def swap_dict_keys_and_vals(d):
+    return {tuple(value): key for key, value in d.items()}
+
+
 if __name__ == '__main__':
     # run("damkiresize.png")
     # img = load_image("damkiresize.png")
@@ -202,4 +272,6 @@ if __name__ == '__main__':
     # for line in b:
     #     print(line)
     # print(is_crown(img))
-    final_run()
+    final_run("planszafullborder.jpg")
+    # img = load_image("planszafullborder.jpg")
+    # initialize_config_colors(img)
