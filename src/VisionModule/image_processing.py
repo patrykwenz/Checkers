@@ -5,10 +5,10 @@ import os
 
 
 # find corners on image in order to get board without layout
-def get_corners(img):
+def get_corners(img, param1=2, param2=3, param3=0.04):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gray = np.float32(gray)
-    dst = cv2.cornerHarris(gray, 2, 3, 0.04)
+    dst = cv2.cornerHarris(gray, param1, param2, param3)
     ret, dst = cv2.threshold(dst, 0.1 * dst.max(), 255, 0)
     dst = np.uint8(dst)
     ret, labels, stats, centroids = cv2.connectedComponentsWithStats(dst)
@@ -34,7 +34,7 @@ def generate_chessboard():
     chessboard = list()
     for i in range(8):
         for j in range(8):
-            FIELD = {"ID": i * 8 + j, "Color": None, "Piece": None}
+            FIELD = {"ID": i * 8 + j, "Piece": None, "Crown": False }
             if (i + j) % 2 == 0:
                 FIELD["Field"] = "White"
                 chessboard.append(FIELD)
@@ -74,7 +74,8 @@ def get_block_size(image):
     w = int(width / 8)
     return h, w
 
-#calculate field id by cords
+
+# calculate field id by cords
 def get_block_id_by_cords(cords, blocksizes):
     x, y = cords
     h, w = blocksizes
@@ -83,7 +84,7 @@ def get_block_id_by_cords(cords, blocksizes):
     return i + j * 8
 
 
-#find all pieces by searching for circles
+# find all pieces by searching for circles
 def find_circles(img):
     BOARD = generate_chessboard()
     param1, param2 = load_configs()
@@ -103,6 +104,7 @@ def find_circles(img):
             cv2.imwrite("savecircles.png", output)
     return BOARD
 
+
 def get_board_from_border(img, points):
     pts2 = np.float32([[0, 0], [800, 0], [0, 800], [800, 800]])
 
@@ -118,26 +120,86 @@ def get_board_from_border(img, points):
     return result
 
 
-def run():
-    #load image
-    img = load_image("planszafullborder.jpg")
+def run(filename="planszafullborder.jpg"):
+    # load image
+    img = load_image(filename)
 
-    #find corners
+    # find corners
     corners = get_corners(img)
 
-    #find valid corners
+    # find valid corners
     points = get_valid_corners(corners)
 
-    #get rid off layout
+    # get rid off layout
     img = get_board_from_border(img, points)
 
-    #find circles
+    # find circles
     board = find_circles(img)
 
     for line in board:
         print(line)
 
 
+def find_pieces(img):
+    BOARD = generate_chessboard()
+    param1, param2 = load_configs()
+    blocksizes = get_block_size(img)
 
+    # find circles
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray_blurred = cv2.medianBlur(gray, 5)
+    detected_circles = cv2.HoughCircles(gray_blurred,
+                                        cv2.HOUGH_GRADIENT, 1, 30, param1=param1,
+                                        param2=param2, minRadius=0, maxRadius=int(img.shape[0] / 8))
+
+    if detected_circles is not None:
+        detected_circles = np.uint16(np.around(detected_circles))
+        output = img.copy()
+        for (x, y, r) in detected_circles[0, :]:
+            board_id = get_block_id_by_cords((x, y), blocksizes=blocksizes)
+            cv2.circle(output, (x, y), r, (0, 255, 0), 2)
+            BOARD[board_id]["Piece"] = img[y, x]
+            cv2.imwrite("savecircles.png", output)
+
+            rectX = int(x - r)
+            rectY = int(y - r)
+            r = int(r)
+            area_to_check = img[rectY:(rectY + 2 * r), rectX:(rectX + 2 * r)]
+            crown_flag = is_crown(area_to_check)
+            BOARD[board_id]["Crown"] = crown_flag
+
+    return BOARD
+
+
+def is_crown(given_area):
+    corners = get_corners(given_area, param1=6, param2=3)
+    number_of_corners = len(corners) - 1
+    return True if number_of_corners == 7 else False
+
+
+def final_run(filename = "damkiresize.png"):
+    # load image
+    img = load_image(filename)
+
+    # find corners
+    corners = get_corners(img)
+
+    # find valid corners
+    points = get_valid_corners(corners)
+
+    # get rid off layout
+    img = get_board_from_border(img, points)
+
+    # find circles
+    board = find_pieces(img)
+
+    for line in board:
+        print(line)
 if __name__ == '__main__':
-    run()
+    # run("damkiresize.png")
+    # img = load_image("damkiresize.png")
+    # b = find_pieces(img)
+    # for line in b:
+    #     print(line)
+    # print(is_crown(img))
+    final_run()
