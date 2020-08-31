@@ -265,13 +265,41 @@ def swap_dict_keys_and_vals(d):
     return {tuple(value): key for key, value in d.items()}
 
 
+"""
+    Finial board look up:
+    {
+        "ID" : ID_FIELD_NUMBER,
+        "PIECE" : PIECE_COLOR_TYPE
+        "CROWN" : IS_CROWN
+        "FIELD" : FIELD_COLOR
+    }
+    """
+
+def run_test(filename  = "planszafullborder.jpg"):
+    img = load_image(filename)
+
+    # find corners
+    corners = get_corners(img)
+
+    # find valid corners
+    points = get_valid_corners(corners)
+
+    # get rid off layout
+    img = get_board_from_border(img, points)
+
+    return find_pieces(img)
 if __name__ == '__main__':
+    b = run_test()
+    for line in b:
+        print(line)
+
+
     # run("damkiresize.png")
     # img = load_image("damkiresize.png")
     # b = find_pieces(img)
     # for line in b:
     #     print(line)
     # print(is_crown(img))
-    final_run("planszafullborder.jpg")
+    # final_run("planszafullborder.jpg")
     # img = load_image("planszafullborder.jpg")
     # initialize_config_colors(img)
