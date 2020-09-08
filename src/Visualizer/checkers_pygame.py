@@ -147,6 +147,12 @@ def start_visualizer():
             elif event.type == pygame.QUIT:
                 game_over = True
 
+            # Try to read move queue
+            else:
+                if len(MoveQueue.queue) > 0:
+                    print(MoveQueue.queue[0])
+                    MoveQueue.queue.pop(0)
+
         clock.tick(60)
         draw_board(screen, board, width, height, radius, border)
         pygame.display.flip()
