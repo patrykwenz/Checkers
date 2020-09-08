@@ -1,5 +1,6 @@
 # Import packages
 import pygame
+import math
 
 # Inititalize Pieces
 empty = 0
@@ -80,8 +81,15 @@ def get_cell_coordinates(cell_no):
 
 
 def get_cell_no(x, y):
-    print(1)
+    if x % 2 == 0 and y % 2 == 1:
+        return math.ceil(x / 2) + (5 * y)
 
+    elif x % 2 == 1 and y % 2 == 0:
+        return math.ceil(x / 2) + (5 * y)
+
+    # White cell
+    else:
+        return 0
 
 def start_visualizer():
     # Initalize vairables
@@ -116,7 +124,16 @@ def start_visualizer():
     while not game_over:
         for event in pygame.event.get():
 
-            if event.type == pygame.QUIT:
+            # debug
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                current_pos = pygame.mouse.get_pos()
+                x = (current_pos[0] // width)
+                y = (current_pos[1] // height)
+                cell = get_cell_no(x, y)
+                print(cell)
+                print(get_cell_coordinates(cell))
+
+            elif event.type == pygame.QUIT:
                 game_over = True
 
         clock.tick(60)
@@ -127,3 +144,4 @@ def start_visualizer():
     pygame.quit()
 
 
+start_visualizer()
