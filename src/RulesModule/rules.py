@@ -109,6 +109,7 @@ def check_if_taking_required(board_2):
 def try_to_get_move_category(board_1, board_2):
     fields = get_difference(board_1, board_2)
     changes = []
+    taken_id = 0
     for i in range(0, len(fields), 2):
         smth = {"ID": fields[i].number, "WAS": fields[i].piece, "IS": fields[i + 1].piece}
         changes.append(smth)
@@ -123,11 +124,19 @@ def try_to_get_move_category(board_1, board_2):
     elif was_this_regular_taking(changes):
         print("REGULAR TAKING")
         move_made = print_regular_taking_pgn(changes)
+        taken_id = get_taken_id(changes, move_made)
     elif was_this_multiple_taking(changes):
         print("MULTIPLE TAKING")
         print_multi_taking(changes)
-    return {"player": Board.previous_move, "move": move_made}
+    return {"player": Board.previous_move, "move": move_made, "captured": taken_id}
 
+def get_taken_id(changes, move):
+    taken_id = 0
+    ids = move.split("x")
+    for i in range(0, len(changes)):
+        if changes[i]["WAS"] is not None and changes[i]["IS"] is None and str(change_id_to_normal(changes[i]["ID"])) not in ids:
+            taken_id = changes[i]["ID"]
+    return change_id_to_normal(taken_id)
 
 def print_regular_move_pgn(changes):
     to_print = ""
@@ -146,9 +155,9 @@ def print_regular_move_pgn(changes):
 def change_id_to_normal(field_id):
     upd_id = field_id + 1
     if upd_id % 2 != 0:
-        return int(upd_id / 2) + 1
+        return int(upd_id // 2) + 1
     else:
-        return int(upd_id / 2) + 1
+        return int(upd_id / 2)
 
 
 def print_regular_taking_pgn(changes):
