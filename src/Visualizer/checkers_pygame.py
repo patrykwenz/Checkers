@@ -1,4 +1,8 @@
 # Import packages
+from src.RulesModule import rules
+from src.VisionModule import image_processing
+from src.RulesModule.board import Board
+
 import pygame
 import math
 
@@ -103,6 +107,12 @@ def get_cell_no(x, y):
         return 0
 
 def start_visualizer():
+    name = "plansza0x.png"
+    previous_board = Board(name.replace("x", str(0)))
+    next_board = Board(name.replace("x", str(1)))
+    MoveQueue.queue.append(rules.try_to_get_move_category(previous_board, next_board))
+    i = 2
+
     # Initalize vairables
     game_over = False
     board = create_board()
@@ -152,10 +162,17 @@ def start_visualizer():
                 if len(MoveQueue.queue) > 0:
                     print(MoveQueue.queue[0])
                     MoveQueue.queue.pop(0)
-
+                try:
+                    previous_board = next_board
+                    next_board = Board(name.replace("x", str(i)))
+                    MoveQueue.queue.append(rules.try_to_get_move_category(previous_board, next_board))
+                except Exception as exception:
+                    print("exception")
+                i = i + 1
         clock.tick(60)
         draw_board(screen, board, width, height, radius, border)
         pygame.display.flip()
 
     pygame.quit()
 
+start_visualizer()
