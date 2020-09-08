@@ -12,13 +12,24 @@ rows = 8
 columns = 8
 
 
+# Define colours
+class Colours:
+    square_black = (0, 0, 0)
+    square_white = (255, 255, 255)
+
+    piece_white = (247, 255, 191)
+    piece_black = (51, 8, 0)
+    piece_black_border = (91, 38, 30)
+    king_gold = (255, 215, 0)
+
+
 # Create board
 def create_board():
     board = [[empty for column in range(columns)] for row in range(rows)]
     return board
 
 
-def place_starting_pieces():
+def place_starting_pieces(board):
     """Assign starting checker pieces for white and black"""
     # Assign starting board locations for black
     for current_row in range(5, 8, 2):
@@ -37,7 +48,7 @@ def place_starting_pieces():
             board[current_row][current_column] = white['pawn']
 
 
-def draw_board(board):
+def draw_board(screen, board, width, height, radius, border):
     for row in range(8):
         for column in range(8):
             # Draw all grid locations as either white or black rectangle
@@ -64,55 +75,48 @@ def draw_board(board):
                 pygame.draw.circle(screen, Colours.king_gold, rect_center, radius, border)
 
 
-# Initalize vairables
-game_over = False
-board = create_board()
-place_starting_pieces()
+def start_visualizer():
+    # Initalize vairables
+    game_over = False
+    board = create_board()
+    place_starting_pieces(board)
 
-# Initalize pygame
-pygame.init()
-window_size = [1000, 1000]
-screen = pygame.display.set_mode(window_size)
+    # Initalize pygame
+    pygame.init()
+    window_size = [1000, 1000]
+    screen = pygame.display.set_mode(window_size)
 
-pygame.display.set_caption("Checkers")
-# icon = pygame.image.load("logo.png")
-# pygame.display.set_icon(icon)
+    pygame.display.set_caption("Checkers")
+    # icon = pygame.image.load("logo.png")
+    # pygame.display.set_icon(icon)
 
-clock = pygame.time.Clock()
-
-
-# Define colours
-class Colours:
-    square_black = (0, 0, 0)
-    square_white = (255, 255, 255)
-
-    piece_white = (247, 255, 191)
-    piece_black = (51, 8, 0)
-    piece_black_border = (91, 38, 30)
-    king_gold = (255, 215, 0)
+    clock = pygame.time.Clock()
 
 
-# This sets the width, height and margin of each board cell
-window_width = window_size[0]
-window_height = window_size[1]
-total_rows = 8
-total_columns = 8
-width = (window_width // total_columns)
-height = (window_height // total_rows)
+    # This sets the width, height and margin of each board cell
+    window_width = window_size[0]
+    window_height = window_size[1]
+    total_rows = 8
+    total_columns = 8
+    width = (window_width // total_columns)
+    height = (window_height // total_rows)
 
-# Set the radius and border border of each checker piece
-radius = (window_width // 20)
-border = (window_width // 200)
+    # Set the radius and border border of each checker piece
+    radius = (window_width // 20)
+    border = (window_width // 200)
 
-# Main active game loop
-while not game_over:
-    for event in pygame.event.get():
+    # Main active game loop
+    while not game_over:
+        for event in pygame.event.get():
 
-        if event.type == pygame.QUIT:
-            game_over = True
+            if event.type == pygame.QUIT:
+                game_over = True
 
-    clock.tick(60)
-    draw_board(board)
-    pygame.display.flip()
+        clock.tick(60)
+        draw_board(screen, board, width, height, radius, border)
 
-pygame.quit()
+        pygame.display.flip()
+
+    pygame.quit()
+
+
