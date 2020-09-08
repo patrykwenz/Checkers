@@ -15,8 +15,8 @@ class MoveQueue:
 # Inititalize Pieces
 empty = 0
 # For the first move, black's pieces are considered friendly
-black = {'pawn': 1, 'king': 3}
-white = {'pawn': 2, 'king': 4}
+black = {"pawn": 1, "king": 3}
+white = {"pawn": 2, "king": 4}
 
 # Initalize board size
 rows = 8
@@ -151,26 +151,15 @@ def start_visualizer():
     # Main active game loop
     while not game_over:
         for event in pygame.event.get():
-
-            # debug
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                current_pos = pygame.mouse.get_pos()
-                x = (current_pos[0] // width)
-                y = (current_pos[1] // height)
-                cell = get_cell_no(x, y)
-                print(cell)
-                print(get_cell_coordinates(cell))
-
-                # moving pieces
-
-            elif event.type == pygame.QUIT:
+            if event.type == pygame.QUIT:
                 game_over = True
 
             # Try to read move queue
             else:
                 if len(MoveQueue.queue) > 0:
-                    # Move pieces
+                    # Processing the move
                     move = MoveQueue.queue[0]
+                    print(move)
 
                     if move["captured"] == 0:
                         move_notation = move["move"].split("-")
@@ -182,8 +171,19 @@ def start_visualizer():
                     new_cell = move_notation[1]
                     old_coords = get_cell_coordinates(old_cell)
                     new_coords = get_cell_coordinates(new_cell)
-                    print(old_coords)
-                    print(new_coords)
+
+                    # Moving the pieces
+                    board[old_coords[0]][old_coords[1]] = empty
+
+                    if move["player"] == "WHITE":
+                        board[new_coords[0]][new_coords[1]] = white["pawn"]
+                    elif move["player"] == "BLACKED":
+                        board[new_coords[0]][new_coords[1]] = black["pawn"]
+
+                    if move["captured"] != 0:
+                        captured_cell = move["captured"]
+                        captured_coords = get_cell_coordinates(captured_cell)
+                        board[captured_coords[0]][captured_coords[1]] = empty
 
                     MoveQueue.queue.pop(0)
                     time.sleep(1)
@@ -195,11 +195,12 @@ def start_visualizer():
                     print("exception")
                 i = i + 1
 
-
-        clock.tick(60)
+        clock.tick(144)
         draw_board(screen, board, width, height, radius, border)
         pygame.display.flip()
 
     pygame.quit()
 
+
 start_visualizer()
+
