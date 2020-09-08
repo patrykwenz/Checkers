@@ -75,6 +75,14 @@ def draw_board(screen, board, width, height, radius, border):
                 pygame.draw.circle(screen, Colours.king_gold, rect_center, radius, border)
 
 
+def get_cell_coordinates(cell_no):
+    print(1)
+
+
+def get_cell_no(x, y):
+    print(1)
+
+
 def start_visualizer():
     # Initalize vairables
     game_over = False
@@ -91,7 +99,6 @@ def start_visualizer():
     # pygame.display.set_icon(icon)
 
     clock = pygame.time.Clock()
-
 
     # This sets the width, height and margin of each board cell
     window_width = window_size[0]
