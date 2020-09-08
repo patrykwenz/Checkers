@@ -5,10 +5,11 @@ from src.RulesModule.board import Board
 
 import pygame
 import math
+import time
 
 # Communication interface - post moves here in that list
 class MoveQueue:
-    queue = [{"player": "white", "move": ""}]
+    queue = []
 
 
 # Inititalize Pieces
@@ -86,25 +87,31 @@ def draw_board(screen, board, width, height, radius, border):
 
 
 def get_cell_coordinates(cell_no):
-    y = cell_no // 5
-    if y % 2 == 0:
-        x = ((cell_no % 5) * 2) - 1
-    else:
-        x = (cell_no % 5) * 2
+    cell_no = int(cell_no)
 
-    return x, y
+    y = (cell_no // 4)
+    x = 2 * ((cell_no - 1) % 4)
+
+    if cell_no % 4 == 0:
+        y = y - 1
+
+    if y % 2 == 0:
+        x = x + 1
+
+    return [x, y]
 
 
 def get_cell_no(x, y):
     if x % 2 == 0 and y % 2 == 1:
-        return math.ceil(x / 2) + (5 * y)
+        return math.ceil(x / 2) + (y * 4) + 1
 
     elif x % 2 == 1 and y % 2 == 0:
-        return math.ceil(x / 2) + (5 * y)
+        return math.ceil(x / 2) + (y * 4)
 
     # White cell
     else:
         return 0
+
 
 def start_visualizer():
     name = "plansza0x.png"
@@ -154,14 +161,32 @@ def start_visualizer():
                 print(cell)
                 print(get_cell_coordinates(cell))
 
+                # moving pieces
+
             elif event.type == pygame.QUIT:
                 game_over = True
 
             # Try to read move queue
             else:
                 if len(MoveQueue.queue) > 0:
-                    print(MoveQueue.queue[0])
+                    # Move pieces
+                    move = MoveQueue.queue[0]
+
+                    if move["captured"] == 0:
+                        move_notation = move["move"].split("-")
+
+                    else:
+                        move_notation = move["move"].split("x")
+
+                    old_cell = move_notation[0]
+                    new_cell = move_notation[1]
+                    old_coords = get_cell_coordinates(old_cell)
+                    new_coords = get_cell_coordinates(new_cell)
+                    print(old_coords)
+                    print(new_coords)
+
                     MoveQueue.queue.pop(0)
+                    time.sleep(1)
                 try:
                     previous_board = next_board
                     next_board = Board(name.replace("x", str(i)))
@@ -169,6 +194,8 @@ def start_visualizer():
                 except Exception as exception:
                     print("exception")
                 i = i + 1
+
+
         clock.tick(60)
         draw_board(screen, board, width, height, radius, border)
         pygame.display.flip()
