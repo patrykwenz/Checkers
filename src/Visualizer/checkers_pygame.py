@@ -2,6 +2,11 @@
 import pygame
 import math
 
+# Communication interface - post moves here in that list
+class MoveQueue:
+    queue = [{"player": "white", "move": ""}]
+
+
 # Inititalize Pieces
 empty = 0
 # For the first move, black's pieces are considered friendly
@@ -77,7 +82,13 @@ def draw_board(screen, board, width, height, radius, border):
 
 
 def get_cell_coordinates(cell_no):
-    print(1)
+    y = cell_no // 5
+    if y % 2 == 0:
+        x = ((cell_no % 5) * 2) - 1
+    else:
+        x = (cell_no % 5) * 2
+
+    return x, y
 
 
 def get_cell_no(x, y):
@@ -138,7 +149,6 @@ def start_visualizer():
 
         clock.tick(60)
         draw_board(screen, board, width, height, radius, border)
-
         pygame.display.flip()
 
     pygame.quit()
