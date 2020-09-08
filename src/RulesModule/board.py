@@ -1,16 +1,16 @@
 
-from src.VisionModule import image_utils
-from src.VisionModule.image_utils import ImageProcessor
+from src.VisionModule import image_processing
 
 
 class Field:
-    def __init__(self, number=0, colour=None, piece=None):
+    def __init__(self, number=0, colour=None, piece=None, crown=False):
         self.colour = colour
         self.number = number
+        self.crown = crown
         # self.piece = piece
-        if piece == 'CAT#2':
+        if piece == 'COLOR_BOT':
             self.piece = 'BLACK'
-        elif piece == 'CAT#1':
+        elif piece == 'COLOR_TOP':
             self.piece = 'WHITE'
         else:
             self.piece = None
@@ -27,7 +27,7 @@ class Field:
                 if (field.piece is None and self.piece is not None) \
                         or (field.piece is not None and self.piece is None):
                     return True
-                elif 'CAT' in field.piece and 'CAT' in self.piece:
+                elif field.piece == self.piece:
                     return False
         else:
             raise Exception("Not the same field!")
@@ -40,30 +40,27 @@ class Field:
                "\n}"
 
     def __eq__(self, other):
-        return isinstance(other, Field)\
-               and other.piece == self.piece\
-               and other.colour == self.colour\
+        return isinstance(other, Field) \
+               and other.piece == self.piece \
+               and other.colour == self.colour \
                and other.number == self.piece
 
+
 class Board:
+    is_taking_required = False
+    taking_required = ""
+    previous_move = "BLACK"
+
     def __init__(self, image_name):
         self.fields = []
-        img_proc = ImageProcessor()
-        image = img_proc.load_image(image_name)
-        image = img_proc.resize(16, image)
-        board_from_image = img_proc.iterate_through_image(image)
+        board_from_image = image_processing.run_test(image_name)
 
         for field in board_from_image:
             number = field["ID"]
-            data = field["DATA"]
-            piece = None
-            colour = None
-            for datum in data:
-                if 'PIECE' in datum:
-                    piece = datum.get("PIECE", None)
-                if 'Field' in datum:
-                    colour = datum.get("Field", {})
-            self.fields.append(Field(number, colour, piece))
+            colour = field["Field"]
+            piece = field["Piece"]
+            crown = field["Crown"]
+            self.fields.append(Field(number, colour, piece, crown))
 
     # debug only
     def validate_initially(self, full_game=False):
@@ -87,6 +84,20 @@ class Board:
         for field in self.fields:
             if field.piece is not None and field.colour == 'WHITE':
                 raise Exception("Draught placed on wrong field! \n" + str(field))
+
+    def get_blacks(self):
+        counter = 0
+        for field in self.fields:
+            if field.piece == 'BLACK':
+                counter += 1
+        return counter
+
+    def get_whites(self):
+        counter = 0
+        for field in self.fields:
+            if field.piece == 'WHITE':
+                counter += 1
+        return counter
 
 
 if __name__ == '__main__':

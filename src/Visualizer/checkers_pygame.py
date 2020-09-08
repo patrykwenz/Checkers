@@ -158,6 +158,3 @@ def start_visualizer():
         pygame.display.flip()
 
     pygame.quit()
-
-
-start_visualizer()
