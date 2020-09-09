@@ -2,6 +2,7 @@
 from src.RulesModule import rules
 from src.VisionModule import image_processing
 from src.RulesModule.board import Board
+from src.VisionModule.image_processing import load_configs_dict
 
 import pygame
 import math
@@ -25,12 +26,13 @@ columns = 8
 
 # Define colours
 class Colours:
+    d = load_configs_dict("../configs/color_config.txt")
     square_black = (0, 0, 0)
     square_white = (255, 255, 255)
 
-    piece_white = (247, 255, 191)
-    piece_black = (51, 8, 0)
-    piece_black_border = (91, 38, 30)
+    piece_white = tuple(d["COLOR_TOP"])
+    piece_black = tuple(d["COLOR_BOT"])
+    piece_black_border = tuple(d["COLOR_BOT"])
     king_gold = (255, 215, 0)
 
 
