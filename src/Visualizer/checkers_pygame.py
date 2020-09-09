@@ -186,6 +186,8 @@ def start_visualizer():
                         board[captured_coords[0]][captured_coords[1]] = empty
 
                     MoveQueue.queue.pop(0)
+                    draw_board(screen, board, width, height, radius, border)
+                    pygame.display.flip()
                     time.sleep(1)
                 try:
                     previous_board = next_board
@@ -196,9 +198,6 @@ def start_visualizer():
                 i = i + 1
 
         clock.tick(144)
-        draw_board(screen, board, width, height, radius, border)
-        pygame.display.flip()
-
     pygame.quit()
 
 
