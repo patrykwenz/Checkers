@@ -48,9 +48,10 @@ class Field:
 
 class Board:
     is_taking_required = False
-    taking_required = ""
-    previous_move = "BLACK"
-
+    taking_required = []
+    who_has_to_take = []
+    previous_move = "WHITE"
+    # TODO - change it to "BLACK" if it fails to start xD
     def __init__(self, image_name):
         self.fields = []
         board_from_image = image_processing.run_test(image_name)
