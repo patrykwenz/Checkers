@@ -8,6 +8,7 @@ import pygame
 import math
 import time
 
+
 # Communication interface - post moves here in that list
 class MoveQueue:
     queue = []
@@ -30,10 +31,9 @@ class Colours:
     square_black = (0, 0, 0)
     square_white = (255, 255, 255)
 
-    piece_white = tuple(d["COLOR_TOP"])
-    piece_black = tuple(d["COLOR_BOT"])
-    piece_black_border = tuple(d["COLOR_BOT"])
-    king_gold = (255, 215, 0)
+    piece_white = tuple(reversed(d["COLOR_TOP"]))
+    piece_black = tuple(reversed(d["COLOR_BOT"]))
+    king_border = (255, 215, 0)
 
 
 # Create board
@@ -74,18 +74,16 @@ def draw_board(screen, board, width, height, radius, border):
             # Draw black pieces
             if board[row][column] == 1:
                 pygame.draw.circle(screen, Colours.piece_black, rect_center, radius)
-                # Draw border around black pieces
-                pygame.draw.circle(screen, Colours.piece_black_border, rect_center, radius, border)
             # Draw white pieces
             if board[row][column] == 2:
                 pygame.draw.circle(screen, Colours.piece_white, rect_center, radius)
             # Drawing king pieces borders
             if board[row][column] == 3:
                 pygame.draw.circle(screen, Colours.piece_black, rect_center, radius)
-                pygame.draw.circle(screen, Colours.king_gold, rect_center, radius, border)
+                pygame.draw.circle(screen, Colours.king_border, rect_center, radius, border)
             if board[row][column] == 4:
                 pygame.draw.circle(screen, Colours.piece_white, rect_center, radius)
-                pygame.draw.circle(screen, Colours.king_gold, rect_center, radius, border)
+                pygame.draw.circle(screen, Colours.king_border, rect_center, radius, border)
 
 
 def get_cell_coordinates(cell_no):
@@ -178,9 +176,9 @@ def start_visualizer():
                     board[old_coords[0]][old_coords[1]] = empty
 
                     if move["player"] == "WHITE":
-                        board[new_coords[0]][new_coords[1]] = white["pawn"]
-                    elif move["player"] == "BLACKED":
                         board[new_coords[0]][new_coords[1]] = black["pawn"]
+                    elif move["player"] == "BLACKED":
+                        board[new_coords[0]][new_coords[1]] = white["pawn"]
 
                     if move["captured"] != 0:
                         captured_cell = move["captured"]
