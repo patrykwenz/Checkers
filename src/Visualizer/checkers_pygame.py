@@ -148,6 +148,10 @@ def start_visualizer():
     radius = (window_width // 20)
     border = (window_width // 200)
 
+    draw_board(screen, board, width, height, radius, border)
+    pygame.display.flip()
+    time.sleep(1)
+
     # Main active game loop
     while not game_over:
         for event in pygame.event.get():
@@ -159,6 +163,7 @@ def start_visualizer():
                 if len(MoveQueue.queue) > 0:
                     # Processing the move
                     move = MoveQueue.queue[0]
+                    MoveQueue.queue.pop(0)
                     print(move)
 
                     if move["captured"] == 0:
@@ -173,19 +178,16 @@ def start_visualizer():
                     new_coords = get_cell_coordinates(new_cell)
 
                     # Moving the pieces
-                    board[old_coords[0]][old_coords[1]] = empty
+                    moving_piece = board[old_coords[0]][old_coords[1]]
 
-                    if move["player"] == "WHITE":
-                        board[new_coords[0]][new_coords[1]] = black["pawn"]
-                    elif move["player"] == "BLACKED":
-                        board[new_coords[0]][new_coords[1]] = white["pawn"]
+                    board[old_coords[0]][old_coords[1]] = empty
+                    board[new_coords[0]][new_coords[1]] = moving_piece
 
                     if move["captured"] != 0:
                         captured_cell = move["captured"]
                         captured_coords = get_cell_coordinates(captured_cell)
                         board[captured_coords[0]][captured_coords[1]] = empty
 
-                    MoveQueue.queue.pop(0)
                     draw_board(screen, board, width, height, radius, border)
                     pygame.display.flip()
                     time.sleep(1)
