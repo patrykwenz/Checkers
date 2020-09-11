@@ -138,7 +138,7 @@ def move_piece(board, cell_from, cell_to, screen):
 
     draw_board(screen, board, width, height, radius, border)
     pygame.display.flip()
-    time.sleep(3)
+    time.sleep(2)
     print(str(cell_from) + '-' + str(cell_to))
 
 
@@ -151,7 +151,7 @@ def capture_piece(board, cell, screen):
 
     draw_board(screen, board, width, height, radius, border)
     pygame.display.flip()
-    time.sleep(3)
+    time.sleep(2)
     print(cell)
 
 
@@ -163,6 +163,7 @@ def start_visualizer():
     next_board = Board(prefix + "001" + suffix)
     previous_board.validate_initially(True)
     j = 2
+    move = rules.try_to_get_move_category(previous_board, next_board)
 
     # Initalize vairables
     game_over = False
@@ -182,27 +183,23 @@ def start_visualizer():
     draw_board(screen, board, width, height, radius, border)
     pygame.display.flip()
     time.sleep(1)
+    move = None
 
     # Main active game loop
     while not game_over:
-        move = 0
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_over = True
 
-            # Try to move queue
+            # Try to move piece
             else:
                 try:
-                    move = 0
                     previous_board = next_board
                     next_board = Board(prefix + str(j).zfill(3) + suffix)
                     move = rules.try_to_get_move_category(previous_board, next_board)
                 except Exception as exception:
                     print("exception")
                 j = j + 1
-
-                if move == 0:
-                    break
 
                 if move["captured"] == 0:
                     move_notation = move["move"].split("-")
