@@ -49,7 +49,7 @@ def path_to_src(dir, filename):
 
 
 def load_image(filename):
-    return cv2.imread(path_to_src("pictures/", filename), cv2.IMREAD_COLOR)
+    return cv2.imread(path_to_src("pictures/newtest2", filename), cv2.IMREAD_COLOR)
 
 
 def save_configs(filename):
@@ -168,14 +168,17 @@ def find_pieces(img):
             board_id = get_block_id_by_cords((x, y), blocksizes=blocksizes)
             cv2.circle(output, (x, y), r, (0, 255, 0), 2)
 
-            color_value = tuple(list(img[y, x]))
+            color_value = tuple(list(img[y + r - 20, x + r - 20]))
             BOARD[board_id]["Piece"] = color_dict[color_value]
             cv2.imwrite("savecircles.png", output)
 
             rectX = int(x - r)
             rectY = int(y - r)
             r = int(r)
-            area_to_check = img[rectY:(rectY + 2 * r), rectX:(rectX + 2 * r)]
+            # area_to_check = img[rectX:(rectX + 2 * r), rectY+10:(rectY + 2 * r)]
+            area_to_check = img[rectY+15:(rectY + 2 * r - 15), rectX+10:(rectX + 2 * r-10)]
+            # area_to_check = img[y - r:(y + r), x - r:(x + r)]
+            cv2.imwrite(str(board_id) + ".png", area_to_check)
             crown_flag = is_crown(area_to_check)
             BOARD[board_id]["Crown"] = crown_flag
 
@@ -275,7 +278,8 @@ def swap_dict_keys_and_vals(d):
     }
     """
 
-def run_test(filename  = "planszafullborder.jpg"):
+
+def run_test(filename="043.png"):
     img = load_image(filename)
 
     # find corners
@@ -288,11 +292,30 @@ def run_test(filename  = "planszafullborder.jpg"):
     img = get_board_from_border(img, points)
 
     return find_pieces(img)
-if __name__ == '__main__':
-    b = run_test()
-    for line in b:
-        print(line)
 
+
+def count_crowns(pip):
+    count: int = 0
+    for d in pip:
+        flag = d["Crown"]
+        if flag:
+            count += 1
+            print("id", ['ID'])
+    return count
+
+
+if __name__ == '__main__':
+    # b = run_test()
+    # for line in b:
+    #     print(line)
+    # print(count_crowns(b))
+    #testmalutki
+    p = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', "pictures/newtest2"))
+    for img in sorted(os.listdir(p)):
+        b = run_test(filename=img)
+        for line in b:
+            print(line)
+        print(img, count_crowns(b))
 
     # run("damkiresize.png")
     # img = load_image("damkiresize.png")
