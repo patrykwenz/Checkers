@@ -252,7 +252,7 @@ def check_for_crown_black(board_2, i):
         if board_2.fields[k].colour is "Black" and board_2.fields[k].piece is "WHITE":
             if board_2.fields[i].number - board_2.fields[k].number % 7 == 0:
                 all_empty = True
-                for l in range(k, i, -7):
+                for l in range(k - 7, i, -7):
                     if board_2.fields[l].piece is not None:
                         all_empty = False
                 if all_empty and board_2.fields[k + 7].piece is None:
@@ -262,7 +262,7 @@ def check_for_crown_black(board_2, i):
                     Board.who_has_to_take.append('BLACK')
             if board_2.fields[i].number - board_2.fields[k].number % 9 == 0:
                 all_empty = True
-                for l in range(k, i, -9):
+                for l in range(k - 9, i, -9):
                     if board_2.fields[l].piece is not None:
                         all_empty = False
                 if all_empty and board_2.fields[k + 9].piece is None:
@@ -272,7 +272,7 @@ def check_for_crown_black(board_2, i):
                     Board.who_has_to_take.append('BLACK')
             if board_2.fields[k].number - board_2.fields[i].number % 7 == 0:
                 all_empty = True
-                for l in range(k, i, 7):
+                for l in range(k + 7, i, 7):
                     if board_2.fields[l].piece is not None:
                         all_empty = False
                 if all_empty and board_2.fields[k - 7].piece is None:
@@ -282,7 +282,7 @@ def check_for_crown_black(board_2, i):
                     Board.who_has_to_take.append('BLACK')
             if board_2.fields[k].number - board_2.fields[i].number % 9 == 0:
                 all_empty = True
-                for l in range(k, i, 9):
+                for l in range(k + 9, i, 9):
                     if board_2.fields[l].piece is not None:
                         all_empty = False
                 if all_empty and board_2.fields[k - 9].piece is None:
@@ -359,6 +359,13 @@ def try_to_get_move_category(board_1, board_2):
                             "Was taking required: " + str(Board.is_taking_required))
         Board.previous_move = who_made_the_move
         check_if_taking_required(board_2, move_made)
+        if check_if_became_queen(board_2, move_made):
+            return {
+                "player": Board.previous_move,
+                "move": move_made,
+                "captured": taken_id,
+                "becameQueen": get_who_became_queen(board_2, move_made)
+            }
     elif was_this_regular_taking(changes):
         print("REGULAR TAKING")
         move_made = print_regular_taking_pgn(changes)
@@ -373,6 +380,13 @@ def try_to_get_move_category(board_1, board_2):
                                 "Was taking required: " + str(Board.is_taking_required))
         Board.previous_move = who_made_the_move
         check_if_taking_required(board_2, move_made)
+        if check_if_became_queen(board_2, move_made):
+            return {
+                "player": Board.previous_move,
+                "move": move_made,
+                "captured": taken_id,
+                "becameQueen": get_who_became_queen(board_2, move_made)
+            }
     elif was_this_a_queen_taking(changes):
         print("QUEEN TAKING")
         move_made = print_queen_taking(changes)
@@ -400,7 +414,40 @@ def try_to_get_move_category(board_1, board_2):
                                 "Was taking required: " + str(Board.is_taking_required))
         Board.previous_move = who_made_the_move
         check_if_taking_required(board_2, move_made)
-    return {"player": Board.previous_move, "move": move_made, "captured": taken_id}
+    else:
+        raise Exception("Not recognized move, probably wrong")
+    return {
+        "player": Board.previous_move,
+        "move": move_made,
+        "captured": taken_id,
+        "becameQueen": None
+    }
+
+
+def check_if_became_queen(board_2, move_made):
+    if "x" in move_made:
+        ids = move_made.split("x")
+    else:
+        ids = move_made.split("-")
+
+    for field in board_2:
+        if field.piece is not None and field.crown and str(change_id_to_normal(int(field.number))) in ids:
+            return True
+
+    return False
+
+
+def get_who_became_queen(board_2, move_made):
+    if "x" in move_made:
+        ids = move_made.split("x")
+    else:
+        ids = move_made.split("-")
+
+    for field in board_2:
+        if field.piece is not None and field.crown and str(change_id_to_normal(int(field.number))) in ids:
+            return str(change_id_to_normal(int(ids[1])))
+
+    return 0
 
 
 def get_taken_by_queen_id(changes):
