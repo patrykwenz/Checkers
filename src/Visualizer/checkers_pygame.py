@@ -3,17 +3,10 @@ from src.RulesModule import rules
 from src.VisionModule import image_processing
 from src.RulesModule.board import Board
 from src.VisionModule.image_processing import load_configs_dict
-import queue
 
 import pygame
 import math
 import time
-
-
-# Communication interface - post moves here in that list
-class MoveQueue:
-    move_queue = queue.SimpleQueue()
-
 
 # Inititalize Pieces
 empty = 0
@@ -113,7 +106,7 @@ def get_cell_coordinates(cell_no):
     if y % 2 == 0:
         x = x + 1
 
-    return [x, y]
+    return [y, x]
 
 
 def get_cell_no(x, y):
