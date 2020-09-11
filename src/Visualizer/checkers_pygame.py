@@ -154,6 +154,7 @@ def start_visualizer():
     previous_board = Board(prefix + "000" + suffix)
     next_board = Board(prefix + "001" + suffix)
     previous_board.validate_initially(True)
+    move = rules.try_to_get_move_category(previous_board, next_board)
     j = 2
 
     # Initalize vairables
@@ -173,7 +174,6 @@ def start_visualizer():
 
     draw_board(screen, board, width, height, radius, border)
     pygame.display.flip()
-    move = None
 
     # Main active game loop
     while not game_over:
@@ -196,7 +196,7 @@ def start_visualizer():
             move = rules.try_to_get_move_category(previous_board, next_board)
             print(move)
         except Exception as exception:
-            print("exception")
+            print(str(exception))
         j = j + 1
 
     clock.tick(144)
