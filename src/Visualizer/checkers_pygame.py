@@ -114,11 +114,13 @@ def get_cell_no(x, y):
 
 
 def start_visualizer():
-    name = "plansza0x.png"
-    previous_board = Board(name.replace("x", str(0)))
-    next_board = Board(name.replace("x", str(1)))
-    MoveQueue.queue.append(rules.try_to_get_move_category(previous_board, next_board))
-    i = 2
+    prefix = "newtest2/"
+    suffix = ".png"
+    name = "000"
+    previous_board = Board(prefix + "000" + suffix)
+    next_board = Board(prefix + "001" + suffix)
+    previous_board.validate_initially(True)
+    j = 2
 
     # Initalize vairables
     game_over = False
@@ -191,11 +193,11 @@ def start_visualizer():
                     time.sleep(1)
                 try:
                     previous_board = next_board
-                    next_board = Board(name.replace("x", str(i)))
+                    next_board = Board(prefix + str(j).zfill(3) + suffix)
                     MoveQueue.queue.append(rules.try_to_get_move_category(previous_board, next_board))
                 except Exception as exception:
                     print("exception")
-                i = i + 1
+                j = j + 1
 
         clock.tick(144)
     pygame.quit()
