@@ -144,7 +144,7 @@ def move_piece(screen, board, cell_from, cell_to, became_queen):
     xyto = get_cell_coordinates(cell_to)
 
     piece = board[xyfrom[0]][xyfrom[1]]
-    if became_queen is not None:
+    if became_queen is not None and piece <= 2:
         piece += 2
 
     board[xyfrom[0]][xyfrom[1]] = empty
