@@ -121,21 +121,23 @@ def get_cell_no(x, y):
         return 0
 
 
-def move_piece(board, cell_from, cell_to, screen):
+def move_piece(screen, board, cell_from, cell_to, became_queen):
     xyfrom = get_cell_coordinates(cell_from)
     xyto = get_cell_coordinates(cell_to)
 
     piece = board[xyfrom[0]][xyfrom[1]]
+    if became_queen is not None:
+        piece += 2
 
     board[xyfrom[0]][xyfrom[1]] = empty
     board[xyto[0]][xyto[1]] = piece
 
     draw_board(screen, board, width, height, radius, border)
     pygame.display.flip()
-    time.sleep(5)
+    time.sleep(0.5)
 
 
-def capture_piece(board, cell, screen):
+def remove_piece(screen, board, cell):
     if cell == 0:
         return
     else:
@@ -144,7 +146,7 @@ def capture_piece(board, cell, screen):
 
     draw_board(screen, board, width, height, radius, border)
     pygame.display.flip()
-    time.sleep(5)
+    time.sleep(0.5)
 
 
 def start_visualizer():
@@ -174,6 +176,7 @@ def start_visualizer():
 
     draw_board(screen, board, width, height, radius, border)
     pygame.display.flip()
+    time.sleep(2)
 
     # Main active game loop
     while not game_over:
@@ -187,8 +190,8 @@ def start_visualizer():
             new_cell = move_notation[1]
 
             # Moving the pieces
-            move_piece(board, old_cell, new_cell, screen)
-            capture_piece(board, move["captured"], screen)
+            move_piece(screen, board, old_cell, new_cell, move["becameQueen"])
+            remove_piece(screen, board, move["captured"])
 
         try:
             previous_board = next_board
