@@ -50,6 +50,7 @@ height = (window_height // total_rows)
 radius = (window_width // 20)
 border = (window_width // 200)
 
+
 # Create board
 def create_board():
     board = [[empty for column in range(columns)] for row in range(rows)]
@@ -138,8 +139,7 @@ def move_piece(board, cell_from, cell_to, screen):
 
     draw_board(screen, board, width, height, radius, border)
     pygame.display.flip()
-    time.sleep(2)
-    print(str(cell_from) + '-' + str(cell_to))
+    time.sleep(5)
 
 
 def capture_piece(board, cell, screen):
@@ -151,8 +151,7 @@ def capture_piece(board, cell, screen):
 
     draw_board(screen, board, width, height, radius, border)
     pygame.display.flip()
-    time.sleep(2)
-    print(cell)
+    time.sleep(5)
 
 
 def start_visualizer():
@@ -163,7 +162,6 @@ def start_visualizer():
     next_board = Board(prefix + "001" + suffix)
     previous_board.validate_initially(True)
     j = 2
-    move = rules.try_to_get_move_category(previous_board, next_board)
 
     # Initalize vairables
     game_over = False
@@ -182,37 +180,34 @@ def start_visualizer():
 
     draw_board(screen, board, width, height, radius, border)
     pygame.display.flip()
-    time.sleep(1)
     move = None
 
     # Main active game loop
     while not game_over:
-            # Try to move piece
-            if True:
-                try:
-                    previous_board = next_board
-                    next_board = Board(prefix + str(j).zfill(3) + suffix)
-                    move = rules.try_to_get_move_category(previous_board, next_board)
-                except Exception as exception:
-                    print("exception")
-                j = j + 1
+        if move is not None:
+            if move["captured"] == 0:
+                move_notation = move["move"].split("-")
+            else:
+                move_notation = move["move"].split("x")
 
-                if move["captured"] == 0:
-                    move_notation = move["move"].split("-")
+            old_cell = move_notation[0]
+            new_cell = move_notation[1]
 
-                else:
-                    move_notation = move["move"].split("x")
+            # Moving the pieces
+            move_piece(board, old_cell, new_cell, screen)
+            capture_piece(board, move["captured"], screen)
 
-                old_cell = move_notation[0]
-                new_cell = move_notation[1]
-
-                # Moving the pieces
-                move_piece(board, old_cell, new_cell, screen)
-                capture_piece(board, move["captured"], screen)
+        try:
+            previous_board = next_board
+            next_board = Board(prefix + str(j).zfill(3) + suffix)
+            move = rules.try_to_get_move_category(previous_board, next_board)
+            print(move)
+        except Exception as exception:
+            print("exception")
+        j = j + 1
 
     clock.tick(144)
     pygame.quit()
 
 
 start_visualizer()
-

@@ -160,16 +160,16 @@ class ImageProcessor():
         return BOARD
 
 
-if __name__ == '__main__':
-    img_proc = ImageProcessor()
-    image = img_proc.load_image("planszafull.png")
-    image = img_proc.resize(20, image)
-    b = img_proc.iterate_through_image(image)
-    for c in b:
-        print(c["ID"], c["DATA"])
-    for i, c in enumerate(b):
-        a = np.array(c['pic'])
-        cv2.imshow(str(i + 1), a)
-        k = cv2.waitKey(0)
-        if k == 27:  # wait for ESC key to exit
-            cv2.destroyAllWindows()
+# if __name__ == '__main__':
+#     img_proc = ImageProcessor()
+#     image = img_proc.load_image("planszafull.png")
+#     image = img_proc.resize(20, image)
+#     b = img_proc.iterate_through_image(image)
+#     for c in b:
+#         print(c["ID"], c["DATA"])
+#     for i, c in enumerate(b):
+#         a = np.array(c['pic'])
+#         cv2.imshow(str(i + 1), a)
+#         k = cv2.waitKey(0)
+#         if k == 27:  # wait for ESC key to exit
+#             cv2.destroyAllWindows()

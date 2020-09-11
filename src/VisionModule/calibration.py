@@ -177,18 +177,18 @@ def get_board_from_border(img):
     return result
 
 
-if __name__ == '__main__':
-    points = []
-    calibrate_params("028.png")
-    # img = load_image("damki.png")
-    # img = resize(10, img)
-    # cv2.imwrite("../pictures/damkiresize.png", img)
-    # calibrate_image(img)
-    # b = generate_chessboard()
-    # find_circles(img, b)
-    # for line in b:
-    #     print(line)
-    # res = calibrate_image(img)
-    # cv2.imwrite(path_to_src('pictures', "calib.png"), res)
-    # pip = load_image("calib.png")
-    # calibrate_params("calib.png")
+# if __name__ == '__main__':
+#     points = []
+#     calibrate_params("028.png")
+#     # img = load_image("damki.png")
+#     # img = resize(10, img)
+#     # cv2.imwrite("../pictures/damkiresize.png", img)
+#     # calibrate_image(img)
+#     # b = generate_chessboard()
+#     # find_circles(img, b)
+#     # for line in b:
+#     #     print(line)
+#     # res = calibrate_image(img)
+#     # cv2.imwrite(path_to_src('pictures', "calib.png"), res)
+#     # pip = load_image("calib.png")
+#     # calibrate_params("calib.png")

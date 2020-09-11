@@ -304,25 +304,25 @@ def count_crowns(pip):
     return count
 
 
-if __name__ == '__main__':
-    # b = run_test()
-    # for line in b:
-    #     print(line)
-    # print(count_crowns(b))
-    #testmalutki
-    p = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', "pictures/newtest2"))
-    for img in sorted(os.listdir(p)):
-        b = run_test(filename=img)
-        for line in b:
-            print(line)
-        print(img, count_crowns(b))
-
-    # run("damkiresize.png")
-    # img = load_image("damkiresize.png")
-    # b = find_pieces(img)
-    # for line in b:
-    #     print(line)
-    # print(is_crown(img))
-    # final_run("planszafullborder.jpg")
-    # img = load_image("planszafullborder.jpg")
-    # initialize_config_colors(img)
+# if __name__ == '__main__':
+#     # b = run_test()
+#     # for line in b:
+#     #     print(line)
+#     # print(count_crowns(b))
+#     #testmalutki
+#     p = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', "pictures/newtest2"))
+#     for img in sorted(os.listdir(p)):
+#         b = run_test(filename=img)
+#         for line in b:
+#             print(line)
+#         print(img, count_crowns(b))
+#
+#     # run("damkiresize.png")
+#     # img = load_image("damkiresize.png")
+#     # b = find_pieces(img)
+#     # for line in b:
+#     #     print(line)
+#     # print(is_crown(img))
+#     # final_run("planszafullborder.jpg")
+#     # img = load_image("planszafullborder.jpg")
+#     # initialize_config_colors(img)

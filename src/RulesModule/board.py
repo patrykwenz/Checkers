@@ -102,15 +102,15 @@ class Board:
         return counter
 
 
-if __name__ == '__main__':
-    board = Board("planszafullWRONG.png")
-
-    try:
-        board.validate_initially(True)
-    except Exception as e:
-        print("***************")
-        print(str(e))
-        print("***************")
-
-    # for c in board.fields:
-    #     print(c)
+# if __name__ == '__main__':
+#     board = Board("planszafullWRONG.png")
+#
+#     try:
+#         board.validate_initially(True)
+#     except Exception as e:
+#         print("***************")
+#         print(str(e))
+#         print("***************")
+#
+#     # for c in board.fields:
+#     #     print(c)
