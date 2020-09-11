@@ -443,7 +443,7 @@ def get_who_became_queen(board_2, move_made):
     else:
         ids = move_made.split("-")
 
-    for field in board_2:
+    for field in board_2.fields:
         if field.piece is not None and field.crown and str(change_id_to_normal(int(field.number))) in ids:
             return str(change_id_to_normal(int(ids[1])))
 
