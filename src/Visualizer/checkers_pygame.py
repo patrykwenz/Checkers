@@ -33,7 +33,7 @@ class Colours:
 # This sets the width, height and margin of each board cell
 window_size = [1000, 1000]
 window_width = window_size[0]
-window_height = window_size[1] - window_size[0] // 10
+window_height = window_size[1] - window_size[0] // 20
 total_rows = 8
 total_columns = 8
 width = (window_width // total_columns)
@@ -47,6 +47,7 @@ border = (window_width // 200)
 # Create board
 def create_board():
     board = [[empty for column in range(columns)] for row in range(rows)]
+    place_starting_pieces(board)
     return board
 
 
@@ -97,12 +98,12 @@ def draw_board(screen, board, width, height, radius, border):
 def draw_popup(screen, message, colour, error):
     rect = pygame.Rect(0, window_height, window_width, window_height // 5)
     pygame.draw.rect(screen, colour, rect, 0)
-    myfont = pygame.font.SysFont('Arial', 45)
+    myfont = pygame.font.SysFont('Arial', 30)
     textsurface = myfont.render(message, False, (0, 0, 0))
     if error is True:
         screen.blit(textsurface, (0, window_height))
     else:
-        screen.blit(textsurface, (window_width // 2 - 50, window_height))
+        screen.blit(textsurface, (window_width // 2 - 30, window_height))
 
 
 
@@ -174,7 +175,6 @@ def start_visualizer():
     # Initalize vairables
     game_over = False
     board = create_board()
-    place_starting_pieces(board)
 
     # Initalize pygame
     pygame.init()
