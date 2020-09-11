@@ -33,7 +33,7 @@ class Colours:
 # This sets the width, height and margin of each board cell
 window_size = [1000, 1000]
 window_width = window_size[0]
-window_height = window_size[1]
+window_height = window_size[1] - window_size[0] // 10
 total_rows = 8
 total_columns = 8
 width = (window_width // total_columns)
@@ -92,6 +92,18 @@ def draw_board(screen, board, width, height, radius, border):
             if board[row][column] == 4:
                 pygame.draw.circle(screen, Colours.piece_white, rect_center, radius)
                 pygame.draw.circle(screen, Colours.king_border, rect_center, radius, border)
+
+
+def draw_popup(screen, message, colour, error):
+    rect = pygame.Rect(0, window_height, window_width, window_height // 5)
+    pygame.draw.rect(screen, colour, rect, 0)
+    myfont = pygame.font.SysFont('Arial', 45)
+    textsurface = myfont.render(message, False, (0, 0, 0))
+    if error is True:
+        screen.blit(textsurface, (0, window_height))
+    else:
+        screen.blit(textsurface, (window_width // 2 - 50, window_height))
+
 
 
 def get_cell_coordinates(cell_no):
@@ -166,12 +178,10 @@ def start_visualizer():
 
     # Initalize pygame
     pygame.init()
+    pygame.font.init()
+
     screen = pygame.display.set_mode(window_size)
-
     pygame.display.set_caption("Checkers")
-    # icon = pygame.image.load("logo.png")
-    # pygame.display.set_icon(icon)
-
     clock = pygame.time.Clock()
 
     draw_board(screen, board, width, height, radius, border)
@@ -189,6 +199,8 @@ def start_visualizer():
             old_cell = move_notation[0]
             new_cell = move_notation[1]
 
+            draw_popup(screen, move["move"], (50, 150, 255), error=False)
+
             # Moving the pieces
             move_piece(screen, board, old_cell, new_cell, move["becameQueen"])
             remove_piece(screen, board, move["captured"])
@@ -200,6 +212,9 @@ def start_visualizer():
             print(move)
         except Exception as exception:
             print(str(exception))
+            draw_popup(screen, str(exception), (255, 55, 50), error=True)
+            pygame.display.flip()
+            time.sleep(5)
         j = j + 1
 
     clock.tick(144)
