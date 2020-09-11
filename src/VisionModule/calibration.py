@@ -13,7 +13,7 @@ def path_to_src(dir, filename):
 
 
 def load_image(filename):
-    return cv2.imread(path_to_src("pictures/", filename), cv2.IMREAD_COLOR)
+    return cv2.imread(path_to_src("pictures/newtest2", filename), cv2.IMREAD_COLOR)
 
 
 def save_configs(filename):
@@ -179,7 +179,7 @@ def get_board_from_border(img):
 
 if __name__ == '__main__':
     points = []
-    calibrate_params("damkiresize.png")
+    calibrate_params("028.png")
     # img = load_image("damki.png")
     # img = resize(10, img)
     # cv2.imwrite("../pictures/damkiresize.png", img)
