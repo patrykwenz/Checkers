@@ -56,7 +56,7 @@ def get_difference(board, board_2):
     return fields
 
 
-def check_if_taking_required(board_2, move_made, previous_move):
+def check_if_taking_required_old(board_2, move_made, previous_move):
     Board.who_has_to_take = []
     Board.is_taking_required = False
     Board.taking_required = []
@@ -115,7 +115,6 @@ def check_if_taking_required(board_2, move_made, previous_move):
         Board.is_taking_required = True
 
 
-
 def get_who_made_the_move(changes, move_made):
     if move_made.__contains__("x"):
         ids = move_made.split("x")
@@ -126,6 +125,216 @@ def get_who_made_the_move(changes, move_made):
             return changes[i]["WAS"]
         elif str(change_id_to_normal(changes[i]["ID"])) in ids and changes[i]["IS"] is not None:
             return changes[i]["IS"]
+
+
+def print_queen_taking(changes):
+    for i in range(0, len(changes)):
+        if changes[i]["WAS"] is None:
+            for k in range(0, len(changes)):
+                temp_diff = changes[i]["ID"] - changes[k]["ID"]
+                if temp_diff > 0:
+                    if (temp_diff % 7 == 0 or temp_diff % 9 == 0) \
+                            and changes[k]["WAS"] is not None and changes[k]["WAS"] == changes[i]["IS"]:
+                        id1 = str(change_id_to_normal(int(changes[k]["ID"])))
+                        id2 = str(change_id_to_normal(int(changes[i]["ID"])))
+
+                        print(id1 + "x" + id2)
+                        return id1 + "x" + id2
+                else:
+                    temp_diff = changes[k]["ID"] - changes[i]["ID"]
+                    if (temp_diff % 7 == 0 or temp_diff % 9 == 0) \
+                            and changes[k]["WAS"] is not None and changes[k]["WAS"] == changes[i]["IS"]:
+                        id1 = str(change_id_to_normal(int(changes[k]["ID"])))
+                        id2 = str(change_id_to_normal(int(changes[i]["ID"])))
+
+                        print(id1 + "x" + id2)
+                        return id1 + "x" + id2
+
+
+def print_queen_move(changes):
+    for i in range(0, len(changes)):
+        if changes[i]["WAS"] is None:
+            for k in range(0, len(changes)):
+                temp_diff = changes[i]["ID"] - changes[k]["ID"]
+                if temp_diff > 0:
+                    if (temp_diff % 7 == 0 or temp_diff % 9 == 0) \
+                            and changes[k]["WAS"] is not None and changes[k]["WAS"] == changes[i]["IS"]:
+                        id1 = str(change_id_to_normal(int(changes[k]["ID"])))
+                        id2 = str(change_id_to_normal(int(changes[i]["ID"])))
+
+                        print(id1 + "-" + id2)
+                        return id1 + "-" + id2
+                else:
+                    temp_diff = changes[k]["ID"] - changes[i]["ID"]
+                    if (temp_diff % 7 == 0 or temp_diff % 9 == 0) \
+                            and changes[k]["WAS"] is not None and changes[k]["WAS"] == changes[i]["IS"]:
+                        id1 = str(change_id_to_normal(int(changes[k]["ID"])))
+                        id2 = str(change_id_to_normal(int(changes[i]["ID"])))
+
+                        print(id1 + "-" + id2)
+                        return id1 + "-" + id2
+
+
+def check_if_taking_required(board_2, move_made):
+    Board.who_has_to_take = []
+    Board.is_taking_required = False
+    Board.taking_required = []
+    # for whites
+    fields_amount = len(board_2.fields)
+    for i in range(0, fields_amount):
+        if board_2.fields[i].piece == "WHITE":
+            check_for_white_pieces(board_2, fields_amount, i)
+            if board_2.fields[i].crown:
+                check_for_crown_white(board_2, i)
+
+    # for blacks
+    for i in range(0, fields_amount):
+        if board_2.fields[i].piece == "BLACK":
+            check_for_black_pieces(board_2, fields_amount, i)
+            if board_2.fields[i].crown:
+                check_for_crown_black(board_2, i)
+
+    # checking if the next turn should consist of taking
+    if Board.is_taking_required and Board.previous_move in Board.who_has_to_take and "x" in move_made:
+        Board.taking_required = True
+    elif Board.is_taking_required and Board.previous_move not in Board.who_has_to_take:
+        Board.is_taking_required = True
+
+
+def check_for_white_pieces(board_2, fields_amount, i):
+    if not (i + 14 > fields_amount or (i + 7) % 8 == 1) and board_2.fields[i + 14].colour is "Black":
+        if board_2.fields[i + 7].piece == "BLACK" and board_2.fields[i + 14].piece is None:
+            Board.taking_required.append(str(change_id_to_normal(i)) + "x" + str(change_id_to_normal(i + 14)))
+            Board.is_taking_required = True
+            Board.who_has_to_take.append('WHITE')
+    if not (i + 18 > fields_amount or (i + 9) % 8 == 0) and board_2.fields[i + 18].colour is "Black":
+        if board_2.fields[i + 9].piece == "BLACK" and board_2.fields[i + 18].piece is None:
+            Board.taking_required.append(str(change_id_to_normal(i)) + "x" + str(change_id_to_normal(i + 18)))
+            Board.is_taking_required = True
+            Board.who_has_to_take.append('WHITE')
+    if not (i - 18 < 1 or (i - 9) % 8 == 1) and board_2.fields[i - 18].colour is "Black":
+        if board_2.fields[i - 9].piece == "BLACK" and board_2.fields[i - 18].piece is None:
+            Board.taking_required.append(str(change_id_to_normal(i)) + "x" + str(change_id_to_normal(i - 18)))
+            Board.is_taking_required = True
+            Board.who_has_to_take.append('WHITE')
+    if not (i - 14 < 1 or (i - 7) % 8 == 0) and board_2.fields[i - 14].colour is "Black":
+        if board_2.fields[i - 7].piece == "BLACK" and board_2.fields[i - 14].piece is None:
+            Board.taking_required.append(str(change_id_to_normal(i)) + "x" + str(change_id_to_normal(i - 14)))
+            Board.is_taking_required = True
+            Board.who_has_to_take.append('WHITE')
+
+
+def check_for_black_pieces(board_2, fields_amount, i):
+    if not (i + 14 >= fields_amount or (i + 7) % 8 == 1) and board_2.fields[i + 14].colour is "Black":
+        if board_2.fields[i + 7].piece == "WHITE" and board_2.fields[i + 14].piece is None:
+            Board.taking_required.append(str(change_id_to_normal(i)) + "x" + str(change_id_to_normal(i + 14)))
+            Board.is_taking_required = True
+            Board.who_has_to_take.append('BLACK')
+    if not (i + 18 >= fields_amount or (i + 9) % 8 == 0) and board_2.fields[i + 18].colour is "Black":
+        if board_2.fields[i + 9].piece == "WHITE" and board_2.fields[i + 18].piece is None:
+            Board.taking_required.append(str(change_id_to_normal(i)) + "x" + str(change_id_to_normal(i + 18)))
+            Board.is_taking_required = True
+            Board.who_has_to_take.append('BLACK')
+    if not (i - 18 < 1 or (i - 9) % 8 == 1) and board_2.fields[i - 18].colour is "Black":
+        if board_2.fields[i - 9].piece == "WHITE" and board_2.fields[i - 18].piece is None:
+            Board.taking_required.append(str(change_id_to_normal(i)) + "x" + str(change_id_to_normal(i - 18)))
+            Board.is_taking_required = True
+            Board.who_has_to_take.append('BLACK')
+    if not (i - 14 < 1 or (i - 7) % 8 == 0) and board_2.fields[i - 14].colour is "Black":
+        if board_2.fields[i - 7].piece == "WHITE" and board_2.fields[i - 14].piece is None:
+            Board.taking_required.append(str(change_id_to_normal(i)) + "x" + str(change_id_to_normal(i - 14)))
+            Board.is_taking_required = True
+            Board.who_has_to_take.append('BLACK')
+
+
+def check_for_crown_black(board_2, i):
+    for k in range(0, 64):
+        if board_2.fields[k].colour is "Black" and board_2.fields[k].piece is "WHITE":
+            if board_2.fields[i].number - board_2.fields[k].number % 7 == 0:
+                all_empty = True
+                for l in range(k, i, -7):
+                    if board_2.fields[l].piece is not None:
+                        all_empty = False
+                if all_empty and board_2.fields[k + 7].piece is None:
+                    Board.is_taking_required = True
+                    Board.taking_required.append(
+                        str(change_id_to_normal(i)) + "x" + str(change_id_to_normal(k + 7)))
+                    Board.who_has_to_take.append('BLACK')
+            if board_2.fields[i].number - board_2.fields[k].number % 9 == 0:
+                all_empty = True
+                for l in range(k, i, -9):
+                    if board_2.fields[l].piece is not None:
+                        all_empty = False
+                if all_empty and board_2.fields[k + 9].piece is None:
+                    Board.is_taking_required = True
+                    Board.taking_required.append(
+                        str(change_id_to_normal(i)) + "x" + str(change_id_to_normal(k + 9)))
+                    Board.who_has_to_take.append('BLACK')
+            if board_2.fields[k].number - board_2.fields[i].number % 7 == 0:
+                all_empty = True
+                for l in range(k, i, 7):
+                    if board_2.fields[l].piece is not None:
+                        all_empty = False
+                if all_empty and board_2.fields[k - 7].piece is None:
+                    Board.is_taking_required = True
+                    Board.taking_required.append(
+                        str(change_id_to_normal(i)) + "x" + str(change_id_to_normal(k - 7)))
+                    Board.who_has_to_take.append('BLACK')
+            if board_2.fields[k].number - board_2.fields[i].number % 9 == 0:
+                all_empty = True
+                for l in range(k, i, 9):
+                    if board_2.fields[l].piece is not None:
+                        all_empty = False
+                if all_empty and board_2.fields[k - 9].piece is None:
+                    Board.is_taking_required = True
+                    Board.taking_required.append(
+                        str(change_id_to_normal(i)) + "x" + str(change_id_to_normal(k - 9)))
+                    Board.who_has_to_take.append('BLACK')
+
+
+def check_for_crown_white(board_2, i):
+    for k in range(0, 64):
+        if board_2.fields[k].colour is "Black" and board_2.fields[k].piece is "BLACK":
+            if board_2.fields[i].number - board_2.fields[k].number % 7 == 0:
+                all_empty = True
+                for l in range(k, i, -7):
+                    if board_2.fields[l].piece is not None:
+                        all_empty = False
+                if all_empty and board_2.fields[k + 7].piece is None:
+                    Board.is_taking_required = True
+                    Board.taking_required.append(
+                        str(change_id_to_normal(i)) + "x" + str(change_id_to_normal(k + 7)))
+                    Board.who_has_to_take.append('WHITE')
+            if board_2.fields[i].number - board_2.fields[k].number % 9 == 0:
+                all_empty = True
+                for l in range(k, i, -9):
+                    if board_2.fields[l].piece is not None:
+                        all_empty = False
+                if all_empty and board_2.fields[k + 9].piece is None:
+                    Board.is_taking_required = True
+                    Board.taking_required.append(
+                        str(change_id_to_normal(i)) + "x" + str(change_id_to_normal(k + 9)))
+                    Board.who_has_to_take.append('WHITE')
+            if board_2.fields[k].number - board_2.fields[i].number % 7 == 0:
+                all_empty = True
+                for l in range(k, i, 7):
+                    if board_2.fields[l].piece is not None:
+                        all_empty = False
+                if all_empty and board_2.fields[k - 7].piece is None:
+                    Board.is_taking_required = True
+                    Board.taking_required.append(
+                        str(change_id_to_normal(i)) + "x" + str(change_id_to_normal(k - 7)))
+                    Board.who_has_to_take.append('WHITE')
+            if board_2.fields[k].number - board_2.fields[i].number % 9 == 0:
+                all_empty = True
+                for l in range(k, i, 9):
+                    if board_2.fields[l].piece is not None:
+                        all_empty = False
+                if all_empty and board_2.fields[k - 9].piece is None:
+                    Board.is_taking_required = True
+                    Board.taking_required.append(
+                        str(change_id_to_normal(i)) + "x" + str(change_id_to_normal(k - 9)))
+                    Board.who_has_to_take.append('WHITE')
 
 
 def try_to_get_move_category(board_1, board_2):
@@ -142,14 +351,14 @@ def try_to_get_move_category(board_1, board_2):
         move_made = print_regular_move_pgn(changes)
         previous_move = Board.previous_move
         who_made_the_move = get_who_made_the_move(changes, move_made)
-        if who_made_the_move == previous_move\
+        if who_made_the_move == previous_move \
                 or (Board.is_taking_required and who_made_the_move in Board.who_has_to_take):
             raise Exception("Not your turn", "Move: " + move_made,
                             "Moved: " + who_made_the_move,
                             "Previous move: " + previous_move,
                             "Was taking required: " + str(Board.is_taking_required))
         Board.previous_move = who_made_the_move
-        check_if_taking_required(board_2, move_made, previous_move)
+        check_if_taking_required(board_2, move_made)
     elif was_this_regular_taking(changes):
         print("REGULAR TAKING")
         move_made = print_regular_taking_pgn(changes)
@@ -157,14 +366,46 @@ def try_to_get_move_category(board_1, board_2):
         previous_move = Board.previous_move
         who_made_the_move = get_who_made_the_move(changes, move_made)
         if who_made_the_move == previous_move or not Board.is_taking_required:
-            if not(who_made_the_move == previous_move and Board.is_taking_required):
+            if not (who_made_the_move == previous_move and Board.is_taking_required):
                 raise Exception("Not your turn", "Move: " + move_made,
                                 "Moved: " + who_made_the_move,
                                 "Previous move: " + previous_move,
                                 "Was taking required: " + str(Board.is_taking_required))
         Board.previous_move = who_made_the_move
-        check_if_taking_required(board_2, move_made, previous_move)
+        check_if_taking_required(board_2, move_made)
+    elif was_this_a_queen_taking(changes):
+        print("QUEEN TAKING")
+        move_made = print_queen_taking(changes)
+        taken_id = get_taken_id(changes, move_made)
+        previous_move = Board.previous_move
+        who_made_the_move = get_who_made_the_move(changes, move_made)
+        if who_made_the_move == previous_move or not Board.is_taking_required:
+            if not (who_made_the_move == previous_move and Board.is_taking_required):
+                raise Exception("Not your turn", "Move: " + move_made,
+                                "Moved: " + who_made_the_move,
+                                "Previous move: " + previous_move,
+                                "Was taking required: " + str(Board.is_taking_required))
+        Board.previous_move = who_made_the_move
+        check_if_taking_required(board_2, move_made)
+    elif was_this_a_queen_move(changes):
+        print("QUEEN MOVE")
+        move_made = print_queen_move(changes)
+        previous_move = Board.previous_move
+        who_made_the_move = get_who_made_the_move(changes, move_made)
+        if who_made_the_move == previous_move or not Board.is_taking_required:
+            if not (who_made_the_move == previous_move and Board.is_taking_required):
+                raise Exception("Not your turn", "Move: " + move_made,
+                                "Moved: " + who_made_the_move,
+                                "Previous move: " + previous_move,
+                                "Was taking required: " + str(Board.is_taking_required))
+        Board.previous_move = who_made_the_move
+        check_if_taking_required(board_2, move_made)
     return {"player": Board.previous_move, "move": move_made, "captured": taken_id}
+
+
+def get_taken_by_queen_id(changes):
+    if changes[0]["WAS"] == changes[1]["IS"]:
+        return change_id_to_normal(int(changes[2]["ID"]))
 
 
 def get_taken_id(changes, move):
@@ -175,6 +416,44 @@ def get_taken_id(changes, move):
                 change_id_to_normal(changes[i]["ID"])) not in ids:
             taken_id = changes[i]["ID"]
     return change_id_to_normal(taken_id)
+
+
+def was_this_a_queen_taking(changes):
+    if len(changes) < 3:
+        return False
+    for i in range(0, len(changes)):
+        if changes[i]["WAS"] is None:
+            for k in range(0, len(changes)):
+                temp_diff = changes[i]["ID"] - changes[k]["ID"]
+                if temp_diff > 0:
+                    if (temp_diff % 7 == 0 or temp_diff % 9 == 0) \
+                            and changes[k]["WAS"] is not None and changes[k]["WAS"] == changes[i]["IS"]:
+                        return True
+                else:
+                    temp_diff = changes[k]["ID"] - changes[i]["ID"]
+                    if (temp_diff % 7 == 0 or temp_diff % 9 == 0) \
+                            and changes[k]["WAS"] is not None and changes[k]["WAS"] == changes[i]["IS"]:
+                        return True
+    return False
+
+
+def was_this_a_queen_move(changes):
+    if len(changes) != 2:
+        return False
+    for i in range(0, len(changes)):
+        if changes[i]["WAS"] is None:
+            for k in range(0, len(changes)):
+                temp_diff = changes[i]["ID"] - changes[k]["ID"]
+                if temp_diff > 0:
+                    if (temp_diff % 7 == 0 or temp_diff % 9 == 0) \
+                            and changes[k]["WAS"] is not None and changes[k]["WAS"] == changes[i]["IS"]:
+                        return True
+                    else:
+                        temp_diff = changes[k]["ID"] - changes[i]["ID"]
+                        if (temp_diff % 7 == 0 or temp_diff % 9 == 0) \
+                                and changes[k]["WAS"] is not None and changes[k]["WAS"] == changes[i]["IS"]:
+                            return True
+    return False
 
 
 def print_regular_move_pgn(changes):
@@ -253,42 +532,6 @@ def was_this_regular_taking(changes):
     return False
 
 
-def was_this_multiple_taking(changes):
-    kill_count = 0
-    begin_point = None
-    end_point = None
-    for s in range(0, len(changes)):
-        if changes[s]["WAS"] is not None and changes[s]["IS"] is None:
-            kill_count = kill_count + 1
-        elif changes[s]["WAS"] is None and changes[s]["IS"] is not None:
-            end_point = changes[s]
-    for s in range(0, len(changes)):
-        if changes[s]["WAS"] == end_point["IS"]:
-            begin_point = changes[s]
-    if kill_count > 2 and begin_point is not None and end_point is not None:
-        return True
-    else:
-        return False
-
-
-def print_multi_taking(changes):
-    to_print = ""
-    kill_count = 0
-    begin_point = None
-    end_point = None
-    for s in range(0, len(changes)):
-        if changes[s]["WAS"] is not None and changes[s]["IS"] is None:
-            kill_count = kill_count + 1
-        elif changes[s]["WAS"] is None and changes[s]["IS"] is not None:
-            end_point = changes[s]
-    for s in range(0, len(changes)):
-        if changes[s]["WAS"] == end_point["IS"]:
-            begin_point = changes[s]
-
-    to_print = str(change_id_to_normal(begin_point["ID"])) + "x" + str(change_id_to_normal(end_point["ID"]))
-    print(to_print)
-
-
 if __name__ == '__main__':
     prefix = "newtest2/"
     suffix = ".png"
@@ -297,8 +540,12 @@ if __name__ == '__main__':
     next_board = Board(prefix + "001" + suffix)
     previous_board.validate_initially(True)
     j = 2
-    while j < 38:
-        try_to_get_move_category(previous_board, next_board)
-        previous_board = next_board
-        next_board = Board(prefix + str(j).zfill(3) + suffix)
-        j = j + 1
+    while True:
+        try:
+            print(j)
+            try_to_get_move_category(previous_board, next_board)
+            previous_board = next_board
+            next_board = Board(prefix + str(j).zfill(3) + suffix)
+            j = j + 1
+        except Exception as ex:
+            raise Exception(ex, "Board: " + prefix + str(j).zfill(3) + suffix)

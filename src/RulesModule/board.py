@@ -51,6 +51,7 @@ class Board:
     taking_required = []
     who_has_to_take = []
     previous_move = "WHITE"
+    queen_placements = []
     # TODO - change it to "BLACK" if it fails to start xD
     def __init__(self, image_name):
         self.fields = []

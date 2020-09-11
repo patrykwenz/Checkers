@@ -49,7 +49,7 @@ def path_to_src(dir, filename):
 
 
 def load_image(filename):
-    return cv2.imread(path_to_src("pictures/newtest2", filename), cv2.IMREAD_COLOR)
+    return cv2.imread(path_to_src("pictures/", filename), cv2.IMREAD_COLOR)
 
 
 def save_configs(filename):
