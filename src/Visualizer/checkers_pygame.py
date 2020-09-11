@@ -111,7 +111,6 @@ def draw_popup(screen, message, colour, error):
         screen.blit(textsurface, (window_width // 2 - 30, window_height))
 
 
-
 def get_cell_coordinates(cell_no):
     cell_no = int(cell_no)
 
@@ -165,6 +164,69 @@ def remove_piece(screen, board, cell):
     draw_board(screen, board, width, height, radius, border)
     pygame.display.flip()
     time.sleep(0.5)
+
+
+import os
+
+
+def run_visualizer():
+    abs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', "pictures/newtest2"))
+
+    previous_board = Board(os.path.join(abs_dir, "000.png"))
+    next_board = Board(os.path.join(abs_dir, "001.png"))
+    previous_board.validate_initially(True)
+    move = rules.try_to_get_move_category(previous_board, next_board)
+
+    game_over = False
+    board = create_board()
+
+    # Initalize pygame
+    pygame.init()
+    pygame.font.init()
+
+    screen = pygame.display.set_mode(window_size)
+    pygame.display.set_caption("Checkers")
+    clock = pygame.time.Clock()
+
+    draw_board(screen, board, width, height, radius, border)
+    pygame.display.flip()
+    time.sleep(2)
+
+    for ix, img_path in enumerate(sorted(os.listdir(abs_dir))):
+        img_path = os.path.join(abs_dir, img_path)
+        print(ix, img_path)
+        if ix == 0:
+            continue
+        if ix == 1:
+            continue
+
+        if move is not None:
+            if move["captured"] == 0:
+                move_notation = move["move"].split("-")
+            else:
+                move_notation = move["move"].split("x")
+
+            old_cell = move_notation[0]
+            new_cell = move_notation[1]
+
+            draw_popup(screen, move["move"], (50, 150, 255), error=False)
+
+            # Moving the pieces
+            move_piece(screen, board, old_cell, new_cell, move["becameQueen"])
+            remove_piece(screen, board, move["captured"])
+
+        try:
+            previous_board = next_board
+            next_board = Board(img_path)
+            move = rules.try_to_get_move_category(previous_board, next_board)
+            print(move)
+        except Exception as exception:
+            print(str(exception))
+            draw_popup(screen, str(exception), (255, 55, 50), error=True)
+            pygame.display.flip()
+
+    clock.tick(144)
+    pygame.quit()
 
 
 def start_visualizer():
@@ -226,4 +288,5 @@ def start_visualizer():
     pygame.quit()
 
 
-start_visualizer()
+# start_visualizer()
+run_visualizer()

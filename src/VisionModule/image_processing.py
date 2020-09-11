@@ -313,11 +313,11 @@ def count_crowns(pip):
 #     p = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', "pictures/newtest2"))
 #     for img in sorted(os.listdir(p)):
 #         b = run_test(filename=img)
-#         for line in b:
-#             print(line)
+#         # for line in b:
+#         #     print(line)
 #         print(img, count_crowns(b))
-#
-#     # run("damkiresize.png")
+# #
+# #     # run("damkiresize.png")
 #     # img = load_image("damkiresize.png")
 #     # b = find_pieces(img)
 #     # for line in b:
