@@ -203,7 +203,7 @@ def start_visualizer():
             move = rules.try_to_get_move_category(previous_board, next_board)
             print(move)
         except Exception as exception:
-            print("exception")
+            print(str(exception))
         j = j + 1
 
     clock.tick(144)
