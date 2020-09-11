@@ -178,7 +178,7 @@ def find_pieces(img):
             # area_to_check = img[rectX:(rectX + 2 * r), rectY+10:(rectY + 2 * r)]
             area_to_check = img[rectY+15:(rectY + 2 * r - 15), rectX+10:(rectX + 2 * r-10)]
             # area_to_check = img[y - r:(y + r), x - r:(x + r)]
-            cv2.imwrite(str(board_id) + ".png", area_to_check)
+            # cv2.imwrite(str(board_id) + ".png", area_to_check)
             crown_flag = is_crown(area_to_check)
             BOARD[board_id]["Crown"] = crown_flag
 

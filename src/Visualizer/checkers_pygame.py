@@ -3,6 +3,7 @@ from src.RulesModule import rules
 from src.VisionModule import image_processing
 from src.RulesModule.board import Board
 from src.VisionModule.image_processing import load_configs_dict
+import queue
 
 import pygame
 import math
@@ -11,7 +12,7 @@ import time
 
 # Communication interface - post moves here in that list
 class MoveQueue:
-    queue = []
+    move_queue = queue.SimpleQueue()
 
 
 # Inititalize Pieces
@@ -35,6 +36,19 @@ class Colours:
     piece_black = tuple(reversed(d["COLOR_BOT"]))
     king_border = (255, 215, 0)
 
+
+# This sets the width, height and margin of each board cell
+window_size = [1000, 1000]
+window_width = window_size[0]
+window_height = window_size[1]
+total_rows = 8
+total_columns = 8
+width = (window_width // total_columns)
+height = (window_height // total_rows)
+
+# Set the radius and border border of each checker piece
+radius = (window_width // 20)
+border = (window_width // 200)
 
 # Create board
 def create_board():
@@ -113,6 +127,34 @@ def get_cell_no(x, y):
         return 0
 
 
+def move_piece(board, cell_from, cell_to, screen):
+    xyfrom = get_cell_coordinates(cell_from)
+    xyto = get_cell_coordinates(cell_to)
+
+    piece = board[xyfrom[0]][xyfrom[1]]
+
+    board[xyfrom[0]][xyfrom[1]] = empty
+    board[xyto[0]][xyto[1]] = piece
+
+    draw_board(screen, board, width, height, radius, border)
+    pygame.display.flip()
+    time.sleep(3)
+    print(str(cell_from) + '-' + str(cell_to))
+
+
+def capture_piece(board, cell, screen):
+    if cell == 0:
+        return
+    else:
+        xycaptured = get_cell_coordinates(cell)
+        board[xycaptured[0]][xycaptured[1]] = empty
+
+    draw_board(screen, board, width, height, radius, border)
+    pygame.display.flip()
+    time.sleep(3)
+    print(cell)
+
+
 def start_visualizer():
     prefix = "newtest2/"
     suffix = ".png"
@@ -129,7 +171,6 @@ def start_visualizer():
 
     # Initalize pygame
     pygame.init()
-    window_size = [1000, 1000]
     screen = pygame.display.set_mode(window_size)
 
     pygame.display.set_caption("Checkers")
@@ -138,68 +179,43 @@ def start_visualizer():
 
     clock = pygame.time.Clock()
 
-    # This sets the width, height and margin of each board cell
-    window_width = window_size[0]
-    window_height = window_size[1]
-    total_rows = 8
-    total_columns = 8
-    width = (window_width // total_columns)
-    height = (window_height // total_rows)
-
-    # Set the radius and border border of each checker piece
-    radius = (window_width // 20)
-    border = (window_width // 200)
-
     draw_board(screen, board, width, height, radius, border)
     pygame.display.flip()
     time.sleep(1)
 
     # Main active game loop
     while not game_over:
+        move = 0
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_over = True
 
-            # Try to read move queue
+            # Try to move queue
             else:
-                if len(MoveQueue.queue) > 0:
-                    # Processing the move
-                    move = MoveQueue.queue[0]
-                    MoveQueue.queue.pop(0)
-                    print(move)
-
-                    if move["captured"] == 0:
-                        move_notation = move["move"].split("-")
-
-                    else:
-                        move_notation = move["move"].split("x")
-
-                    old_cell = move_notation[0]
-                    new_cell = move_notation[1]
-                    old_coords = get_cell_coordinates(old_cell)
-                    new_coords = get_cell_coordinates(new_cell)
-
-                    # Moving the pieces
-                    moving_piece = board[old_coords[0]][old_coords[1]]
-
-                    board[old_coords[0]][old_coords[1]] = empty
-                    board[new_coords[0]][new_coords[1]] = moving_piece
-
-                    if move["captured"] != 0:
-                        captured_cell = move["captured"]
-                        captured_coords = get_cell_coordinates(captured_cell)
-                        board[captured_coords[0]][captured_coords[1]] = empty
-
-                    draw_board(screen, board, width, height, radius, border)
-                    pygame.display.flip()
-                    time.sleep(1)
                 try:
+                    move = 0
                     previous_board = next_board
                     next_board = Board(prefix + str(j).zfill(3) + suffix)
-                    MoveQueue.queue.append(rules.try_to_get_move_category(previous_board, next_board))
+                    move = rules.try_to_get_move_category(previous_board, next_board)
                 except Exception as exception:
                     print("exception")
                 j = j + 1
+
+                if move == 0:
+                    break
+
+                if move["captured"] == 0:
+                    move_notation = move["move"].split("-")
+
+                else:
+                    move_notation = move["move"].split("x")
+
+                old_cell = move_notation[0]
+                new_cell = move_notation[1]
+
+                # Moving the pieces
+                move_piece(board, old_cell, new_cell, screen)
+                capture_piece(board, move["captured"], screen)
 
         clock.tick(144)
     pygame.quit()
