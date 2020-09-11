@@ -187,12 +187,8 @@ def start_visualizer():
 
     # Main active game loop
     while not game_over:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                game_over = True
-
             # Try to move piece
-            else:
+            if True:
                 try:
                     previous_board = next_board
                     next_board = Board(prefix + str(j).zfill(3) + suffix)
@@ -214,7 +210,7 @@ def start_visualizer():
                 move_piece(board, old_cell, new_cell, screen)
                 capture_piece(board, move["captured"], screen)
 
-        clock.tick(144)
+    clock.tick(144)
     pygame.quit()
 
 
