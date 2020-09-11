@@ -101,14 +101,14 @@ def draw_popup(screen, message, colour, error):
 
     font_size = 30
     if error is True:
-        font_size /= 2
+        font_size /= 1.5
 
     myfont = pygame.font.SysFont('Arial', int(font_size))
     textsurface = myfont.render(message, False, (0, 0, 0))
     if error is True:
         screen.blit(textsurface, (0, window_height))
     else:
-        screen.blit(textsurface, (window_width // 2 - 30, window_height))
+        screen.blit(textsurface, (window_width // 2 - 120, window_height))
 
 
 def get_cell_coordinates(cell_no):
@@ -151,7 +151,7 @@ def move_piece(screen, board, cell_from, cell_to, became_queen):
 
     draw_board(screen, board, width, height, radius, border)
     pygame.display.flip()
-    time.sleep(0.5)
+    time.sleep(1)
 
 
 def remove_piece(screen, board, cell):
@@ -163,7 +163,7 @@ def remove_piece(screen, board, cell):
 
     draw_board(screen, board, width, height, radius, border)
     pygame.display.flip()
-    time.sleep(0.5)
+    time.sleep(1)
 
 
 import os
@@ -209,7 +209,7 @@ def run_visualizer():
             old_cell = move_notation[0]
             new_cell = move_notation[1]
 
-            draw_popup(screen, move["move"], (50, 150, 255), error=False)
+            draw_popup(screen, "Valid move: " + move["move"], (50, 150, 255), error=False)
 
             # Moving the pieces
             move_piece(screen, board, old_cell, new_cell, move["becameQueen"])
@@ -224,69 +224,10 @@ def run_visualizer():
             print(str(exception))
             draw_popup(screen, str(exception), (255, 55, 50), error=True)
             pygame.display.flip()
-
-    clock.tick(144)
-    pygame.quit()
-
-
-def start_visualizer():
-    prefix = "newtest2/"
-    suffix = ".png"
-    name = "000"
-    previous_board = Board(prefix + "000" + suffix)
-    next_board = Board(prefix + "001" + suffix)
-    previous_board.validate_initially(True)
-    move = rules.try_to_get_move_category(previous_board, next_board)
-    j = 2
-
-    # Initalize vairables
-    game_over = False
-    board = create_board()
-
-    # Initalize pygame
-    pygame.init()
-    pygame.font.init()
-
-    screen = pygame.display.set_mode(window_size)
-    pygame.display.set_caption("Checkers")
-    clock = pygame.time.Clock()
-
-    draw_board(screen, board, width, height, radius, border)
-    pygame.display.flip()
-    time.sleep(2)
-
-    # Main active game loop
-    while not game_over:
-        if move is not None:
-            if move["captured"] == 0:
-                move_notation = move["move"].split("-")
-            else:
-                move_notation = move["move"].split("x")
-
-            old_cell = move_notation[0]
-            new_cell = move_notation[1]
-
-            draw_popup(screen, move["move"], (50, 150, 255), error=False)
-
-            # Moving the pieces
-            move_piece(screen, board, old_cell, new_cell, move["becameQueen"])
-            remove_piece(screen, board, move["captured"])
-
-        try:
-            previous_board = next_board
-            next_board = Board(prefix + str(j).zfill(3) + suffix)
-            move = rules.try_to_get_move_category(previous_board, next_board)
-            print(move)
-        except Exception as exception:
-            print(str(exception))
-            draw_popup(screen, str(exception), (255, 55, 50), error=True)
-            pygame.display.flip()
             time.sleep(5)
-        j = j + 1
 
     clock.tick(144)
-    pygame.quit()
 
 
-# start_visualizer()
+
 run_visualizer()
