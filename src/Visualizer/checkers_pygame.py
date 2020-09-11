@@ -47,6 +47,7 @@ border = (window_width // 200)
 # Create board
 def create_board():
     board = [[empty for column in range(columns)] for row in range(rows)]
+    place_starting_pieces(board)
     return board
 
 
@@ -174,7 +175,6 @@ def start_visualizer():
     # Initalize vairables
     game_over = False
     board = create_board()
-    place_starting_pieces(board)
 
     # Initalize pygame
     pygame.init()
