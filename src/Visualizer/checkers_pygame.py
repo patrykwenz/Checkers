@@ -27,7 +27,7 @@ class Colours:
 
     piece_white = tuple(reversed(d["COLOR_TOP"]))
     piece_black = tuple(reversed(d["COLOR_BOT"]))
-    king_border = (255, 215, 0)
+    king_cross = (255, 255, 255)
 
 
 # This sets the width, height and margin of each board cell
@@ -89,16 +89,21 @@ def draw_board(screen, board, width, height, radius, border):
             # Drawing king pieces borders
             if board[row][column] == 3:
                 pygame.draw.circle(screen, Colours.piece_black, rect_center, radius)
-                pygame.draw.circle(screen, Colours.king_border, rect_center, radius, border)
+                pygame.draw.circle(screen, Colours.king_cross, rect_center, radius // 5, 0)
             if board[row][column] == 4:
                 pygame.draw.circle(screen, Colours.piece_white, rect_center, radius)
-                pygame.draw.circle(screen, Colours.king_border, rect_center, radius, border)
+                pygame.draw.circle(screen, Colours.king_cross, rect_center, radius // 5, 0)
 
 
 def draw_popup(screen, message, colour, error):
     rect = pygame.Rect(0, window_height, window_width, window_height // 5)
     pygame.draw.rect(screen, colour, rect, 0)
-    myfont = pygame.font.SysFont('Arial', 30)
+
+    font_size = 30
+    if error is True:
+        font_size /= 2
+
+    myfont = pygame.font.SysFont('Arial', int(font_size))
     textsurface = myfont.render(message, False, (0, 0, 0))
     if error is True:
         screen.blit(textsurface, (0, window_height))
